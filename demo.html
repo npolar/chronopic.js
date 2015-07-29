@@ -5,6 +5,7 @@
 		<link rel="stylesheet" href="dist/css/chronopic.min.css" />
 		<script src="dist/chronopic.min.js"></script>
 		<script src="dist/i18n/nb_NO.min.js"></script>
+		<script src="dist/i18n/nn_NO.min.js"></script>
 		<script src="dist/i18n/ja_JP.min.js"></script>
 	</head>
 	<body>
@@ -13,6 +14,8 @@
 		<script>
 			var chronopic = new Chronopic('input[type="datetime"]', {
 				locale: 'nb_NO',
+				min: { year: 2000, month: 1, day: 4 },
+				max: { year: 2020, month: 5, day: 12 },
 				onChange: function(elem, date) {
 					console.log(elem, date);
 				}
