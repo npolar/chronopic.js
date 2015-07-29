@@ -33,6 +33,15 @@
 	padding: 2px;
 }
 
+.chronopic thead .year input
+{
+	border: 0;
+	font-weight: bold;
+	height: 100%;
+	text-align: center;
+	width: 100%;
+}
+
 .chronopic tbody td
 {
 	background: inherit;
@@ -66,7 +75,7 @@
 
 .chronopic tbody .disabled
 {
-	color: #eee;
+	color: #eee !important;
 }
 
 .chronopic tbody .disabled:hover
@@ -74,13 +83,13 @@
 	cursor: not-allowed;
 }
 
-.chronopic thead .title th:not(.disabled):hover,
+.chronopic thead .title th:not(.disabled):not(.year):hover,
 .chronopic tbody td:not(.week):not(.disabled):hover
 {
 	cursor: pointer;
 }
 
-.chronopic thead .title th:not(.disabled):not(.selected):hover,
+.chronopic thead .title th:not(.disabled):not(.selected):not(.year):hover,
 .chronopic tbody td:not(.week):not(.disabled):not(.selected):hover
 {
 	background: #eee;
