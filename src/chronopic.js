@@ -15,6 +15,15 @@
 		return options;
 	}
 	
+	function isNum() {
+		for(var a in arguments) {
+			if(typeof (a = arguments[a]) != "number" || isNaN(a) || Math.abs(a) >= Infinity) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	function parseSelector(selector) {
 		var parsed = { attribs: {}, classes: [] };
 		
@@ -214,12 +223,42 @@
 			className: "chronopic",
 			format: null,
 			locale: "en_GB",
+			max: { year: 9999 },
+			min: { year: 0 },
 			onChange: null
 		});
 		
-		var now = new Date();
 		this.instances = [];
 		this.i18n = _.i18n.en_GB;
+		this.max = (typeof options.max == 'object' ? options.max : {});
+		this.min = (typeof options.min == 'object' ? options.min : {});
+		
+		var now = new Date(), self = this;
+		
+		function valid(year, month, day) {
+			if(isNum(year)) {
+				if((isNum(self.min.year) && year < self.min.year)
+				|| (isNum(self.max.year) && year > self.max.year)) {
+					return false;
+				}
+				
+				if(isNum(month)) {
+					if((isNum(self.min.month) && month < self.min.month && year <= self.min.year)
+					|| (isNum(self.max.month) && month > self.max.month && year >= self.max.year)) {
+						return false;
+					}
+					
+					if(isNum(day)) {
+						if((isNum(self.min.day) && day < self.min.day && month <= self.min.month && year <= self.min.year)
+						|| (isNum(self.max.day) && day > self.max.day && month >= self.max.month && year >= self.max.year)) {
+							return false;
+						}
+					}
+				}
+			}
+				
+			return true;
+		}
 		
 		(typeof selector == "string" ? $(selector) : [ selector ])
 		.forEach(function(element) {
@@ -248,13 +287,15 @@
 						return this.date.getDate();
 					},
 					set day(value) {
-						this.date.setDate(value);
-						this.selected.day = new Date(this.date);
-						this.element.value = options.format ? ϝ(this.date, options.format, self.i18n) : this.date.toDateString();
-						this.hide();
-						
-						if(typeof options.onChange == 'function') {
-							options.onChange(element, this.date);
+						if(valid(this.date.getFullYear(), this.date.getMonth() + 1, value)) {
+							this.date.setDate(value);
+							this.selected.day = new Date(this.date);
+							this.element.value = options.format ? ϝ(this.date, options.format, self.i18n) : this.date.toDateString();
+							this.hide();
+							
+							if(typeof options.onChange == 'function') {
+								options.onChange(element, this.date);
+							}
 						}
 					},
 					hide: function() {
@@ -273,9 +314,11 @@
 						return this.date.getMonth();
 					},
 					set month(value) {
-						this.date.setMonth(value);
-						this.selected.month = new Date(this.date);
-						this.show("day");
+						if(valid(this.date.getFullYear(), value + 1)) {
+							this.date.setMonth(value);
+							this.selected.month = new Date(this.date);
+							this.show("day");
+						}
 					},
 					rebuild: function(table) {
 						var instance = this,
@@ -309,15 +352,17 @@
 								row.forEach(function(col) {
 									var classNames = ".day",
 										monthDiff = col.getMonth() - instance.month,
+										disabled = !valid(col.getFullYear(), col.getMonth() + 1, col.getDate()),
 										elem;
 										
 									((monthDiff == -1 || monthDiff == 11) && (classNames += ".prev"));
 									((monthDiff == 1 || monthDiff == -11) && (classNames += ".next"));
 									(sel.day && δ(sel.day).compare(col) >= 3 && (classNames += ".selected"));
+									(disabled && (classNames += ".disabled"));
 									(δ(col).compare(now) >= 3 && (classNames += ".now"));
 									
 									tr.add((elem = ε("td[title=" + ϝ(col, self.locale.formatDay, self.locale) + "]" + classNames, { html: col.getDate() })));
-									elem.on("click", function() { instance.month = col.getMonth(), instance.day = col.getDate(); });
+									(!disabled && elem.on("click", function() { instance.month = col.getMonth(), instance.day = col.getDate(); }));
 								});
 							});
 						}
@@ -327,7 +372,10 @@
 								ε("tr.title").add([
 									ε("th.prev[title=" + self.locale.prevYear + "]", { html: "&lt;" })
 									.on("click", function(e) { instance.year--; e.stopPropagation(); }),
-									ε("th[colspan=6][title=" + self.locale.selectYear + "]", { html: ϝ(instance.date, self.locale.formatYear, self.locale) }),
+									ε("th.year[colspan=6][title=" + self.locale.year + "]").add(
+										ε("input[type=number][step=1][min=" + (self.min.year || 0) + "][max=" + (self.max.year || 9999) + "][value=" + instance.year + "]")
+										.on("change", function(e) { instance.year = e.target.value; })
+									),
 									ε("th.next[title=" + self.locale.nextYear + "]", { html: "&gt;" })
 									.on("click", function(e) { instance.year++; e.stopPropagation(); })
 								]),
@@ -340,13 +388,15 @@
 								row.forEach(function(col) {
 									var classNames = ".month",
 										month = col.getMonth(),
+										disabled = !valid(col.getFullYear(), month + 1),
 										elem;
 									
 									(sel.month && δ(sel.month).compare(col) >= 2 && (classNames += ".selected"));
+									(disabled && (classNames += ".disabled"));
 									(δ(col).compare(now) >= 2 && (classNames += ".now"));
 									
 									tr.add((elem = ε("td[colspan=2][title=" + self.locale.monthName[month] + "]" + classNames, { html: self.locale.monthNameShort[month] })));
-									elem.on("click", function() { instance.month = month; });
+									(!disabled && elem.on("click", function() { instance.month = month; }));
 								});
 							});
 						}
@@ -368,8 +418,10 @@
 						return this.date.getFullYear();
 					},
 					set year(value) {
-						this.date.setFullYear(value);
-						this.show("month");
+						if(valid(value)) {
+							this.date.setFullYear(value);
+							this.show("month");
+						}
 					}
 				}));
 				
@@ -420,7 +472,6 @@
 			disabled:		"Disabled",
 			formatDay:		"{DDDD} {D}. {MMMM} {YYYY}",
 			formatMonth:	"{MMMM} {YYYY}",
-			formatYear:		"{YYYY}",
 			month:			"Month",
 			monthName:		[ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
 			monthNameShort:	[ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
@@ -429,7 +480,6 @@
 			prevMonth:		"Previous month",
 			prevYear:		"Previous year",
 			selectMonth:	"Select month",
-			selectYear:		"Select year",
 			week:			"Week",
 			year:			"Year"
 		}
