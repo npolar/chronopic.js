@@ -6,14 +6,16 @@ Chronopic is added to HTML elements by creating a new instance of *Chronopic* us
 
 ```javascript
 var chronopic = new Chronopic('input[type="date"]', {
-  locale: 'nb_NO',                  // Use nb_NO as the default locale
-  format: '{YYYY}-{MM}-{DD}',       // Use YYYY-MM-DD as output format
-  onChange: function(elem, date) {  // Function called when date is changed
+  locale: 'nb_NO',                        // Use nb_NO as the default locale
+  format: '{YYYY}-{MM}-{DD}',             // Use YYYY-MM-DD as output format
+  min: { year: 2000, month: 2 },          // Set lower boundary to February 2000
+  max: { year: 2020, month: 5, day: 12 }, // Set upper boundary to May 12. 2020
+  onChange: function(elem, date) {        // Function called when date is changed
     console.log(elem, date);
   }
 });
 
-chronopic.locale = 'ja_JP';         // Change locale to ja_JP
+chronopic.locale = 'ja_JP';               // Change locale to ja_JP
 ```
 
 ### Constructor options:
@@ -22,6 +24,8 @@ Key           | Value                                       | Default
 **className** | CSS Class Name added to container           | *chronepic*
 **format**    | Output format (or *null* for native format) | *null*
 **locale**    | Name of locale being used                   | *en_GB*
+**min**       | Object describing the minimum date          | *{ year: 0 }*
+**max**       | Object describing the maximum date          | *{ year: 9999 }*
 **onChange**  | Callback function when value changes        | *null*
 
 ### Format values:
