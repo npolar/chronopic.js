@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="css/chronopic.css" />
+		<script src="chronopic.min.js"></script>
+		<script src="i18n/nb_NO.js"></script>
+		<script src="i18n/ja_JP.js"></script>
+	</head>
+	<body>
+		<input type="datetime" />
+			
+		<script>
+			var chronopic = new Chronopic('input[type="datetime"]', {
+				locale: 'nb_NO',
+				onChange: function(elem, date) {
+					console.log(elem, date);
+				}
+			});
+		</script>
+	</body>
+</html>
