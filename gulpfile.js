@@ -33,7 +33,7 @@ gulp.task('minify', [
 ]);
 
 gulp.task('validate', function() {
-	return gulp.src(["src/*.js", "src/**/*.js"])
+	return gulp.src(['src/*.js", "src/**/*.js'])
 	.pipe(jshint({ expr: true }))
 	.pipe(jshint.reporter('default'));
 });
@@ -44,5 +44,5 @@ gulp.task('default', [
 ]);
 
 gulp.task('watch', function() {
-	gulp.watch("src/*", "src/**/*", ['default']);
+	gulp.watch(['src/*', 'src/**/*'], ['default']);
 });
