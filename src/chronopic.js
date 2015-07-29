@@ -236,21 +236,25 @@
 		var now = new Date(), self = this;
 		
 		function valid(year, month, day) {
+			var days, min = self.min, max = self.max;
+			while(day > (days = δ(new Date(year, month, day)).days)) { ++month; day -= day - days; }
+			while(month > 12) { ++year; month -= 12; }
+			
 			if(isNum(year)) {
-				if((isNum(self.min.year) && year < self.min.year)
-				|| (isNum(self.max.year) && year > self.max.year)) {
+				if((isNum(min.year) && year < min.year)
+				|| (isNum(max.year) && year > max.year)) {
 					return false;
 				}
 				
 				if(isNum(month)) {
-					if((isNum(self.min.month) && month < self.min.month && year <= self.min.year)
-					|| (isNum(self.max.month) && month > self.max.month && year >= self.max.year)) {
+					if((isNum(min.month) && month < min.month && year <= min.year)
+					|| (isNum(max.month) && month > max.month && year >= max.year)) {
 						return false;
 					}
 					
 					if(isNum(day)) {
-						if((isNum(self.min.day) && day < self.min.day && month <= self.min.month && year <= self.min.year)
-						|| (isNum(self.max.day) && day > self.max.day && month >= self.max.month && year >= self.max.year)) {
+						if((isNum(min.day) && day < min.day && month <= min.month && year <= min.year)
+						|| (isNum(max.day) && day > max.day && month >= max.month && year >= max.year)) {
 							return false;
 						}
 					}
