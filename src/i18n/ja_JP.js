@@ -5,7 +5,6 @@
 		disabled:		"無効",
 		formatDay:		"{YYYY}年{MM}月{D}日, {DDDD}",
 		formatMonth:	"{YYYY}年{MMMM}",
-		formatYear:		"{YYYY}年",
 		month:			"月",
 		monthName:		[ "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月" ],
 		monthNameShort:	[ "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月" ],
@@ -14,7 +13,6 @@
 		prevMonth:		"前月",
 		prevYear:		"前年",
 		selectMonth:	"月選択",
-		selectYear:		"年選択",
 		week:			"週",
 		year:			"年"
 	};

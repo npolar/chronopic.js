@@ -5,7 +5,6 @@
 		disabled:		"Deaktivert",
 		formatDay:		"{DDDD} {D}. {MMMM} {YYYY}",
 		formatMonth:	"{MMMM} {YYYY}",
-		formatYear:		"{YYYY}",
 		month:			"Månad",
 		monthName:		[ "Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Desember" ],
 		monthNameShort:	[ "Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Des" ],
@@ -14,7 +13,6 @@
 		prevMonth:		"Førre månad",
 		prevYear:		"Førre år",
 		selectMonth:	"Velj månad",
-		selectYear:		"Velj år",
 		week:			"Veke",
 		year:			"År"
 	};
