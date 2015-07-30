@@ -3,16 +3,14 @@
 		return Array.prototype.slice.call((context || document).querySelectorAll(selector));
 	}
 	
-	function parseOptions(options, defaults) {
-		((typeof options == "object" && options) || (options = {}));
-		
-		for(var def in defaults) {
-			if(!options.hasOwnProperty(def)) {
-				options[def] = defaults[def];
+	function isObj() {
+		for(var a in arguments) {
+			if(typeof (a = arguments[a]) != "object" || !a) {
+				return false;
 			}
 		}
 		
-		return options;
+		return true;
 	}
 	
 	function isNum() {
@@ -21,7 +19,20 @@
 				return false;
 			}
 		}
+		
 		return true;
+	}
+	
+	function parseOptions(options, defaults) {
+		(isObj(options) || (options = {}));
+		
+		for(var def in defaults) {
+			if(!options.hasOwnProperty(def)) {
+				options[def] = defaults[def];
+			}
+		}
+		
+		return options;
 	}
 	
 	function parseSelector(selector) {
@@ -224,6 +235,7 @@
 	function _(selector, options) {
 		options = parseOptions(options, {
 			className: "chronopic",
+			date: null,
 			format: null,
 			locale: "en_GB",
 			max: { year: 9999 },
@@ -233,10 +245,12 @@
 		
 		this.instances = [];
 		this.i18n = _.i18n.en_GB;
-		this.max = (typeof options.max == 'object' ? options.max : {});
-		this.min = (typeof options.min == 'object' ? options.min : {});
+		this.max = (isObj(options.max) ? options.max : {});
+		this.min = (isObj(options.min) ? options.min : {});
 		
-		var now = new Date(), self = this;
+		var self = this, date = new Date();
+		date.setDate(1); // Prevent date overflow if month with less days than current date is set
+		(isObj(options.date) && (date = ((date = options.date) instanceof Date ? new Date(date) : new Date(date.year, date.month - 1, date.day))));
 		
 		function valid(year, month, day) {
 			var days, min = self.min, max = self.max;
@@ -285,8 +299,8 @@
 					tables[table].body = ε("tbody", { appendTo: tables[table] });
 				});
 				
-				this.instances.push((instance = {
-					date: new Date(now.getFullYear(), now.getMonth()),
+				self.instances.push((instance = {
+					date: new Date(date),
 					container: container,
 					element: element,
 					selected: {},
@@ -442,6 +456,8 @@
 						}
 					}
 				}));
+				
+				((isObj(options.date) && (instance.day = instance.date.getDate())) || (element.value = "")); // Set referee element value
 				
 				element.addEventListener("click", function(e) {
 					instance[(instance.visible ? "hide" : "show")]();
