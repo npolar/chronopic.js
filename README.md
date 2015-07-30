@@ -1,5 +1,5 @@
 # chronopic.js
-Date/Time/Datetime JavaScript Widget
+Date/Time/Datetime JavaScript Widget ([demo](http://npolar.github.io/chronopic.js/demo/)).
 
 ### Usage:
 Chronopic is added to HTML elements by creating a new instance of *Chronopic* using a CSS selector string as the first parameter, and optionally a map of options as the second parameter:
@@ -15,17 +15,20 @@ var chronopic = new Chronopic('input[type="date"]', {
   }
 });
 
-chronopic.locale = 'ja_JP';               // Change locale to ja_JP
+// Invoke Chronopic with locale settings if lang attribute is set
+new Chronopic('input[type="date"][lang="jp"]', { locale: 'ja_JP' });
+new Chronopic('input[type="date"][lang="no"]', { locale: 'nb_NO' });
 ```
 
 ### Constructor options:
 Key           | Value                                       | Default
 --------------|---------------------------------------------|--------------
 **className** | CSS Class Name added to container           | *chronepic*
+**date**      | Pre-selected date object (or *null*)        | *null*
 **format**    | Output format (or *null* for native format) | *null*
 **locale**    | Name of locale being used                   | *en_GB*
-**min**       | Object describing the minimum date          | *{ year: 0 }*
 **max**       | Object describing the maximum date          | *{ year: 9999 }*
+**min**       | Object describing the minimum date          | *{ year: 0 }*
 **onChange**  | Callback function when value changes        | *null*
 
 ### Format values:
