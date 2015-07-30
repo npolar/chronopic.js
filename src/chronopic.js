@@ -439,14 +439,13 @@
 				
 				element.addEventListener("click", function(e) {
 					instance[(instance.visible ? "hide" : "show")]();
-					e.stopPropagation();
 				});
 				
 				document.addEventListener("click", function(e) {
 					var node = e.target;
 					
 					while(node) {
-						if(node == container.domElement) {
+						if(node == element || node == container.domElement) {
 							return;
 						}
 						
