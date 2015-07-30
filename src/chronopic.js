@@ -58,7 +58,8 @@
 			format: "YYYY-MM-DDDD",
 			html: "",
 			insertAfter: null,
-			insertBefore: null
+			insertBefore: null,
+			replace: null
 		});
 		
 		var rules = parseSelector(selector), attr, elem;
@@ -81,7 +82,9 @@
 		elem.innerHTML = options.html;
 		
 		// Add element to DOM
-		if(options.appendTo) {
+		if(options.replace) {
+			options.replace.parentNode.replaceChild(elem, options.replace);
+		} else if(options.appendTo) {
 			(this.parent = options.appendTo).domElement.appendChild(elem);
 		} else if(options.insertAfter) {
 			options.insertAfter.parentNode.insertBefore(elem, options.insertAfter.nextSibling);			
@@ -267,8 +270,11 @@
 		(typeof selector == "string" ? $(selector) : [ selector ])
 		.forEach(function(element) {
 			if(element instanceof HTMLElement) {
+				var sibling = element.nextSibling;
+				((sibling.tagName == "DIV" && sibling.classList.contains(options.className)) || (sibling = null));
+				
 				var className = options.className,
-					container = ε("div." + className, { insertAfter: element }),
+					container = ε("div." + className, { insertAfter: element, replace: sibling }),
 					instance,
 					self = this,
 					tables = {};
