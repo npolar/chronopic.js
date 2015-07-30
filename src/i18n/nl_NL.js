@@ -3,7 +3,7 @@
 		dayOfWeek:		[ "zondag", "maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag" ],
 		dayOfWeekShort:	[ "zo", "ma", "di", "woe", "do", "vrij", "zat" ],
 		disabled:		"gedeactiveerd",
-		formatDay:		" {D} {MMMM} {YYYY}",
+		formatDay:		"{DDDD} {D} {MMMM} {YYYY}",
 		formatMonth:	"{MMMM} {YYYY}",
 		month:			"maand",
 		monthName:		[ "januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december" ],
