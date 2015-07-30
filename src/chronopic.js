@@ -280,7 +280,7 @@
 				});
 				
 				this.instances.push((instance = {
-					date: new Date(now),
+					date: new Date(now.getFullYear(), now.getMonth()),
 					container: container,
 					element: element,
 					selected: {},
