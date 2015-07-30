@@ -5,21 +5,35 @@
 		<link rel="stylesheet" href="dist/css/chronopic.min.css" />
 		<script src="dist/chronopic.min.js"></script>
 		<script src="dist/i18n/nb_NO.min.js"></script>
-		<script src="dist/i18n/nn_NO.min.js"></script>
 		<script src="dist/i18n/ja_JP.min.js"></script>
+		<style>
+			input[type="datetime"]
+			{
+				background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><path fill="rgb(204, 204, 204)" d="M160 192h64v64h-64zM256 192h64v64h-64zM352 192h64v64h-64zM64 384h64v64h-64zM160 384h64v64h-64zM256 384h64v64h-64zM160 288h64v64h-64zM256 288h64v64h-64zM352 288h64v64h-64zM64 288h64v64h-64zM416 0v32h-64v-32h-224v32h-64v-32h-64v512h480v-512h-64zM448 480h-416v-352h416v352z"></path></svg>') no-repeat right 3px center;
+				background-size: auto 70%;
+				border: 1px solid #ccc;
+				box-sizing: border-box;
+				padding: 5px;
+				width: 200px;
+			}
+		</style>
 	</head>
 	<body>
 		<input type="datetime" />
+		<input type="datetime" />
+		<input type="datetime" style="width: 300px;" lang="jp" placeholder="japanese" />
+		<input type="datetime" style="width: 300px;" lang="no" placeholder="norwegian" />
+		<input type="datetime" past placeholder="past only" />
+		<input type="datetime" future placeholder="future only" />
 			
 		<script>
-			var chronopic = new Chronopic('input[type="datetime"]', {
-				locale: 'nb_NO',
-				min: { year: 2000, month: 1, day: 4 },
-				max: { year: 2020, month: 5, day: 12 },
-				onChange: function(elem, date) {
-					console.log(elem, date);
-				}
-			});
+			var now = new Date(), now = { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
+			
+			new Chronopic('input[type="datetime"]', { date: now });
+			new Chronopic('input[type="datetime"][lang="jp"]', { locale: 'ja_JP', format: "{YY}年{MM}月{DD}日 ({DDDD})" });
+			new Chronopic('input[type="datetime"][lang="no"]', { locale: 'nb_NO', format: "{DDDD} {D}. {MMMM} {YYYY}" });
+			new Chronopic('input[type="datetime"][past]', { max: now });
+			new Chronopic('input[type="datetime"][future]', { min: now });
 		</script>
 	</body>
 </html>
