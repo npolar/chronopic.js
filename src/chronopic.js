@@ -503,7 +503,7 @@
 			dayOfWeek:		[ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
 			dayOfWeekShort:	[ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
 			disabled:		"Disabled",
-			formatDay:		"{DDDD} {D}. {MMMM} {YYYY}",
+			formatDay:		"{DDDD} {D} {MMMM} {YYYY}",
 			formatMonth:	"{MMMM} {YYYY}",
 			month:			"Month",
 			monthName:		[ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
