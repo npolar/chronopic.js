@@ -1,14 +1,22 @@
+.chronopic
+{
+	position: absolute;
+}
+
 .chronopic table
 {
+	background: #fff;
 	border: 1px solid #eee;
 	border-spacing: 0;
 	border-radius: 5px;
 	font-size: .8em;
 	height: 225px;
+	min-width: 200px;
 	padding: 0px;
+	position: absolute;
 	table-layout: fixed;
 	text-align: center;
-	width: 300px;
+	width: 100%;
 }
 
 .chronopic table td

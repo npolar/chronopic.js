@@ -417,6 +417,14 @@
 								tables[t].classes[(t == table ? "remove" : "add")]("hidden");
 							}
 						}
+						
+						var container = this.container.domElement, elem = this.element;
+						container.style.top = elem.offsetTop + elem.offsetHeight + "px";
+						container.style.left = elem.offsetLeft + "px";
+						
+						if(container.offsetWidth < elem.offsetWidth) {
+							container.style.width = elem.offsetWidth + "px";
+						}
 					},
 					get year() {
 						return this.date.getFullYear();
