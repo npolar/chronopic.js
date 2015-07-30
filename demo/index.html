@@ -7,6 +7,7 @@
 		<script src="js/chronopic-i18n/nb_NO.min.js"></script>
 		<script src="js/chronopic-i18n/nn_NO.min.js"></script>
 		<script src="js/chronopic-i18n/ja_JP.min.js"></script>
+		<script src="js/chronopic-i18n/nl_BE.min.js"></script>
 		<style>
 			input[type="datetime"]
 			{
@@ -22,20 +23,22 @@
 		</style>
 	</head>
 	<body>
-		<input type="datetime" lang="ja" placeholder="japanese" />
-		<input type="datetime" lang="nb" placeholder="norwegian (bokmål)" />
-		<input type="datetime" lang="nn" placeholder="norwegian (nynorsk)" />
+		<input type="datetime" lang="ja" placeholder="Japanese" />
+		<input type="datetime" lang="nb" placeholder="Norwegian (Bokmål)" />
+		<input type="datetime" lang="nn" placeholder="Norwegian (Nynorsk)" />
+		<input type="datetime" lang="nl" placeholder="Dutch (Belgium)" />
 		<input type="datetime" past placeholder="past only" />
 		<input type="datetime" future placeholder="future only" />
 		<input type="datetime" />
-			
+
 		<script>
 			var now = new Date(), now = { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
-			
+
 			new Chronopic('input[type="datetime"]', { date: now });
 			new Chronopic('input[type="datetime"][lang="ja"]', { locale: 'ja_JP', format: "{YY}年{MM}月{DD}日 ({DDDD})" });
 			new Chronopic('input[type="datetime"][lang="nb"]', { locale: 'nb_NO', format: "{DDDD} {D}. {MMMM} {YYYY}" });
 			new Chronopic('input[type="datetime"][lang="nn"]', { locale: 'nn_NO', format: "{DDDD} {D}. {MMMM} {YYYY}" });
+			new Chronopic('input[type="datetime"][lang="nl"]', { locale: 'nl_BE', format: "{D} {MMMM} {YYYY}" });
 			new Chronopic('input[type="datetime"][past]', { max: now });
 			new Chronopic('input[type="datetime"][future]', { min: now });
 		</script>
