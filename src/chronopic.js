@@ -1,102 +1,75 @@
 (function() {
-	function $(selector, context) {
-		return Array.prototype.slice.call((context || document).querySelectorAll(selector));
+	function isObj(value) {
+		return (typeof value == "object" && value);
 	}
 	
-	function isObj() {
-		for(var a in arguments) {
-			if(typeof (a = arguments[a]) != "object" || !a) {
-				return false;
-			}
-		}
-		
-		return true;
-	}
-	
-	function isNum() {
-		for(var a in arguments) {
-			if(typeof (a = arguments[a]) != "number" || isNaN(a) || Math.abs(a) >= Infinity) {
-				return false;
-			}
-		}
-		
-		return true;
+	function isNum(value) {
+		return (typeof value == "number" && !isNaN(value) && Math.abs(value) < Infinity);
 	}
 	
 	function parseOptions(options, defaults) {
 		(isObj(options) || (options = {}));
 		
-		for(var def in defaults) {
-			if(!options.hasOwnProperty(def)) {
-				options[def] = defaults[def];
-			}
+		for(var d in defaults) {
+			(options.hasOwnProperty(d) || (options[d] = defaults[d]));
 		}
 		
 		return options;
-	}
-	
-	function parseSelector(selector) {
-		var parsed = { attribs: {}, classes: [] };
-		
-		selector.match(/(\[[^\]]+\]|#[^#.\[]+|\.[^#.\[]+|\w+)/g)
-		.forEach(function(match) {
-			switch(match[0]) {
-				case "[":
-					var m = match.match(/^\[([^=\]]+)=?([^\]]+)?\]$/);
-					parsed.attribs[m[1]] = m[2] || "";
-					break;
-					
-				case ".":
-					parsed.classes.push(match.substr(1));
-					break;
-					
-				case "#":
-					parsed.id = match.substr(1);
-					break;
-					
-				default:
-					parsed.tag = match;
-			}
-		});
-		
-		return parsed;
 	}
 	
 	function Element(selector, options) {
 		options = parseOptions(options, {
 			appendTo: null,
 			context: document,
-			format: "YYYY-MM-DDDD",
 			html: "",
 			insertAfter: null,
 			insertBefore: null,
 			replace: null
 		});
 		
-		var rules = parseSelector(selector), attr, elem;
-		elem = this.domElement = options.context.createElement(rules.tag);
+		var parsed = (function(selector) {
+			var parsed = { attribs: {}, classes: [] };
+			selector.match(/(\[[^\]]+\]|#[^#.\[]+|\.[^#.\[]+|\w+)/g)
+			.forEach(function(match) {
+				switch(match[0]) {
+					case "[":
+						var m = match.match(/^\[([^=\]]+)=?([^\]]+)?\]$/);
+						parsed.attribs[m[1]] = m[2] || "";
+						break;
+						
+					case ".":
+						parsed.classes.push(match.substr(1));
+						break;
+						
+					case "#":
+						parsed.id = match.substr(1);
+						break;
+						
+					default:
+						parsed.tag = match;
+				}
+			});
+			return parsed;
+		})(selector), a, elem = options.context.createElement(parsed.tag);
+		
+		(this.element = elem).innerHTML = options.html;
 		this.parent = null;
 		
 		// Add classes
-		rules.classes.forEach(function(className) {
+		parsed.classes.forEach(function(className) {
 			elem.classList.add(className);
 		});
 		
 		// Add attributes
-		for(attr in rules.attribs) {
-			if(rules.attribs.hasOwnProperty(attr)) {
-				elem.setAttribute(attr, rules.attribs[attr]);
-			}
+		for(a in parsed.attribs) {
+			(parsed.attribs.hasOwnProperty(a) && elem.setAttribute(a, parsed.attribs[a]));
 		}
-		
-		// Add inner HTML
-		elem.innerHTML = options.html;
 		
 		// Add element to DOM
 		if(options.replace) {
 			options.replace.parentNode.replaceChild(elem, options.replace);
 		} else if(options.appendTo) {
-			(this.parent = options.appendTo).domElement.appendChild(elem);
+			(this.parent = options.appendTo).element.appendChild(elem);
 		} else if(options.insertAfter) {
 			options.insertAfter.parentNode.insertBefore(elem, options.insertAfter.nextSibling);			
 		} else if(options.insertBefore) {
@@ -110,17 +83,17 @@
 			
 			(elements instanceof Array ? elements : [ elements ])
 			.forEach(function(element) {
-				this.domElement.appendChild(element.domElement);
+				this.element.appendChild(element.element);
 				element.parent = this;
 			}, this);
 			
 			return this;
 		},
 		get classes() {
-			return this.domElement.classList;
+			return this.element.classList;
 		},
 		clear: function() {
-			var elem = this.domElement, child;
+			var elem = this.element, child;
 			
 			while((child = elem.firstChild)) {
 				elem.removeChild(child);
@@ -129,7 +102,7 @@
 			return this;
 		},
 		on: function(event, callback) {
-			this.domElement.addEventListener(event, callback);
+			this.element.addEventListener(event, callback);
 			return this;
 		}
 	};
@@ -249,7 +222,6 @@
 		this.min = (isObj(options.min) ? options.min : {});
 		
 		var self = this, date = new Date();
-		date.setDate(1); // Prevent date overflow if month with less days than current date is set
 		(isObj(options.date) && (date = ((date = options.date) instanceof Date ? new Date(date) : new Date(date.year, date.month - 1, date.day))));
 		
 		function valid(year, month, day) {
@@ -281,7 +253,7 @@
 			return true;
 		}
 		
-		(typeof selector == "string" ? $(selector) : [ selector ])
+		(typeof selector == "string" ? Array.prototype.slice.call(document.querySelectorAll(selector)) : [ selector ])
 		.forEach(function(element) {
 			if(element instanceof HTMLElement) {
 				var sibling = element.nextSibling;
@@ -327,18 +299,20 @@
 							tables[t].classes.add("hidden");
 						}
 						
+						this.visible = false;
+						this.selected.month = null;
+						
 						if(this.selected.day) {
 							this.date = new Date(this.selected.day);
 							this.selected.month = new Date(this.date);
-						} else this.selected.month = null;
-						
-						this.visible = false;
+						}
 					},
 					get month() {
 						return this.date.getMonth();
 					},
 					set month(value) {
 						if(valid(this.date.getFullYear(), value + 1)) {
+							this.date.setDate(1);
 							this.date.setMonth(value);
 							this.selected.month = new Date(this.date);
 							this.show("day");
@@ -398,7 +372,7 @@
 									.on("click", function(e) { instance.year--; e.stopPropagation(); }),
 									ε("th.year[colspan=6][title=" + self.locale.year + "]").add(
 										ε("input[type=number][step=1][min=" + (self.min.year || 0) + "][max=" + (self.max.year || 9999) + "][value=" + instance.year + "]")
-										.on("change", function(e) { instance.year = e.target.value; })
+										.on("change", function(e, v) { console.log(e.target.value); (isNum((v = Number(e.target.value))) && (instance.year = v)); })
 									),
 									ε("th.next[title=" + self.locale.nextYear + "]", { html: "&gt;" })
 									.on("click", function(e) { instance.year++; e.stopPropagation(); })
@@ -433,12 +407,10 @@
 						this.visible = true;
 						
 						for(var t in tables) {
-							if(tables.hasOwnProperty(t)) {
-								tables[t].classes[(t == table ? "remove" : "add")]("hidden");
-							}
+							(tables.hasOwnProperty(t) && tables[t].classes[(t == table ? "remove" : "add")]("hidden"));
 						}
 						
-						var container = this.container.domElement, elem = this.element;
+						var container = this.container.element, elem = this.element;
 						container.style.top = elem.offsetTop + elem.offsetHeight + "px";
 						container.style.left = elem.offsetLeft + "px";
 						
@@ -457,23 +429,18 @@
 					}
 				}));
 				
-				((isObj(options.date) && (instance.day = instance.date.getDate())) || (element.value = "")); // Set referee element value
+				((isObj(options.date) && (instance.day = instance.date.getDate())) || (element.value = ""));
 				
 				element.addEventListener("click", function(e) {
 					instance[(instance.visible ? "hide" : "show")]();
 				});
 				
-				document.addEventListener("click", function(e) {
-					var node = e.target;
-					
-					while(node) {
-						if(node == element || node == container.domElement) {
+				document.addEventListener("click", function(e, node) {
+					while((node = node ? node.parentNode : e.target)) {
+						if(node == element || node == container.element) {
 							return;
 						}
-						
-						node = node.parentNode;
 					}
-					
 					instance.hide();
 				});
 			}
