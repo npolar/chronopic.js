@@ -30,24 +30,11 @@
 		var parsed = (function(selector) {
 			var parsed = { attribs: {}, classes: [] };
 			selector.match(/(\[[^\]]+\]|#[^#.\[]+|\.[^#.\[]+|\w+)/g)
-			.forEach(function(match) {
-				switch(match[0]) {
-					case "[":
-						var m = match.match(/^\[([^=\]]+)=?([^\]]+)?\]$/);
-						parsed.attribs[m[1]] = m[2] || "";
-						break;
-						
-					case ".":
-						parsed.classes.push(match.substr(1));
-						break;
-						
-					case "#":
-						parsed.id = match.substr(1);
-						break;
-						
-					default:
-						parsed.tag = match;
-				}
+			.forEach(function(m) {
+				(m[0] == "[" ? ((m = m.match(/^\[([^=\]]+)=?([^\]]+)?\]$/)) && (parsed.attribs[m[1]] = m[2] || "")) : // Attribute
+				(m[0] == "." ? parsed.classes.push(m.substr(1)) : // Class
+				(m[0] == "#" ? (parsed.attribs.id = m.substr(1)) : // ID
+				(parsed.tag = m)))); // Tag
 			});
 			return parsed;
 		})(selector), a, elem = options.context.createElement(parsed.tag);
