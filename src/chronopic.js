@@ -196,7 +196,7 @@
 		options = parseOptions(options, {
 			className: "chronopic",
 			date: null,
-			format: null,
+			format: "{YYYY}-{MM}-{DD}",
 			locale: "en_GB",
 			max: { year: 9999 },
 			min: { year: 0 },
@@ -264,6 +264,7 @@
 					element: element,
 					selected: {},
 					tables: tables,
+					value: "",
 					visible: false,
 					
 					get day() {
@@ -273,7 +274,7 @@
 						if(valid(this.date.getFullYear(), this.date.getMonth() + 1, value)) {
 							this.date.setDate(value);
 							this.selected.day = new Date(this.date);
-							this.element.value = options.format ? ϝ(this.date, options.format, self.i18n) : this.date.toDateString();
+							this.value = this.element.value = ϝ(this.date, options.format, self.i18n);
 							this.hide();
 							
 							if(typeof options.onChange == 'function') {
@@ -420,6 +421,70 @@
 				
 				element.addEventListener("click", function(e) {
 					instance[(instance.visible ? "hide" : "show")]();
+				});
+				
+				element.addEventListener("change", function(e) {
+					var format = options.format,
+						oldVal = instance.value,
+						newVal = e.target.value,
+						valPos = 0,
+						status = true,
+						d, m, y, h, n, s, a;
+					
+					format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
+						if(status) {
+							if(/^\{(.*)\}$/.test(seg)) {
+								var val = newVal.slice(valPos);
+								(++idx < arr.length && (val = val.slice(0, val.search(arr[idx]))));
+								valPos += val.length;
+								seg = seg.slice(1, -1);
+								
+								if(seg == "DD" || seg == "D") {
+									d = Number(val);
+								} else if(seg == "MMMM") {
+									self.i18n.monthName.forEach(function(monthName, monthNumber) {
+										(!m && val == monthName && (m = monthNumber + 1));
+									});
+									(m || (status = false));
+								} else if(seg == "MMM") {
+									self.i18n.monthNameShort.forEach(function(monthName, monthNumber) {
+										(!m && val == monthName && (m = monthNumber + 1));
+									});
+									(m || (status = false));
+								} else if(seg == "MM" || seg == "M") {
+									m = Number(val);
+								} else if(seg == "YYYY" || seg == "YY") {
+									y = Number(val);
+								} else if(seg == "HH" || seg == "H" || seg == "hh" || seg == "h") {
+									h = Number(val);
+								} else if(seg == "mm" || seg == "m") {
+									n = Number(val);
+								} else if(seg == "s" || seg == "s") {
+									s = Number(val);
+								} else if(seg == "ap") {
+									((a = val) != "㏂" && a != "㏘" && (status = false));
+								} else {
+									status = false;
+								}
+							} else if(newVal.substr(valPos, seg.length) == seg) {
+								valPos += seg.length;
+							} else {
+								status = false;
+							}
+						}
+					});
+					
+					if(!status) {
+						e.target.value = oldVal;
+						return;
+					}
+					
+					(a && a == "㏘" && (h += 12));
+					(y !== undefined && (instance.year = y));
+					(m !== undefined && (instance.month = m - 1));
+					(d !== undefined && (instance.day = d));
+					
+					// TODO: hours, minutes, seconds
 				});
 				
 				document.addEventListener("click", function(e, node) {
