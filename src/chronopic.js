@@ -262,6 +262,16 @@
 		(typeof selector == "string" ? Array.prototype.slice.call(document.querySelectorAll(selector)) : [ selector ])
 		.forEach(function(element) {
 			if(element instanceof HTMLElement) {
+				_.instances.forEach(function(parent) {
+					parent.instances.forEach(function(child, index, array) {
+						if(child.element.element == element) {
+							// Clear events and remove instance if previously defined by different selector
+							child.element.on([ "click", "change" ], null);
+							array.splice(index, 1);
+						}
+					});
+				});
+				
 				var sibling = element.nextSibling;
 				((sibling.tagName == "DIV" && sibling.classList.contains(options.className)) || (sibling = null));
 				
@@ -379,7 +389,7 @@
 									.on("click", function(e) { instance.year--; e.stopPropagation(); }),
 									ε("th.year[colspan=6][title=" + self.locale.year + "]").add(
 										ε("input[type=number][step=1][min=" + (self.min.year || 0) + "][max=" + (self.max.year || 9999) + "][value=" + instance.year + "]")
-										.on("change", function(e, v) { console.log(e.target.value); (isNum((v = Number(e.target.value))) && (instance.year = v)); })
+										.on("change", function(e, v) { (isNum((v = Number(e.target.value))) && (instance.year = v)); })
 									),
 									ε("th.next[title=" + self.locale.nextYear + "]", { html: "&gt;" })
 									.on("click", function(e) { instance.year++; e.stopPropagation(); })
@@ -518,7 +528,10 @@
 		}, this);
 		
 		this.locale = options.locale;
+		_.instances.push(this);
 	}
+	
+	_.instances = [];
 	
 	_.prototype = {
 		get locale() {
