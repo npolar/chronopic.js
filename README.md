@@ -25,7 +25,7 @@ Key           | Value                                       | Default
 --------------|---------------------------------------------|--------------
 **className** | CSS Class Name added to container           | *chronepic*
 **date**      | Pre-selected date object (or *null*)        | *null*
-**format**    | Output format (or *null* for native format) | *null*
+**format**    | Output format                               | *{YYYY}-{MM}-{DD}*
 **locale**    | Name of locale being used                   | *en_GB*
 **max**       | Object describing the maximum date          | *{ year: 9999 }*
 **min**       | Object describing the minimum date          | *{ year: 0 }*
