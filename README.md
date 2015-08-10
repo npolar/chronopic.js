@@ -7,7 +7,7 @@ Chronopic is added to HTML elements by creating a new instance of *Chronopic* us
 ```javascript
 var chronopic = new Chronopic('input[type="date"]', {
   locale: 'nb_NO',                        // Use nb_NO as the default locale
-  format: '{YYYY}-{MM}-{DD}',             // Use YYYY-MM-DD as output format
+  format: '{D}. {MMMM} {YYYY}',           // Use D. MMMM YYYY as output format
   min: { year: 2000, month: 2 },          // Set lower boundary to February 2000
   max: { year: 2020, month: 5, day: 12 }, // Set upper boundary to May 12. 2020
   onChange: function(elem, date) {        // Function called when date is changed
@@ -23,7 +23,7 @@ new Chronopic('input[type="date"][lang="no"]', { locale: 'nb_NO' });
 ### Constructor options:
 Key           | Value                                       | Default
 --------------|---------------------------------------------|--------------
-**className** | CSS Class Name added to container           | *chronepic*
+**className** | CSS Class Name added to container           | *chronopic*
 **date**      | Pre-selected date object (or *null*)        | *null*
 **format**    | Output format                               | *{YYYY}-{MM}-{DD}*
 **locale**    | Name of locale being used                   | *en_GB*
