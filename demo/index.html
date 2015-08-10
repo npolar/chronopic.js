@@ -35,9 +35,9 @@
 			var now = new Date(), now = { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
 
 			new Chronopic('input[type="datetime"]', { date: now });
-			new Chronopic('input[type="datetime"][lang="ja"]', { locale: 'ja_JP', format: "{YY}年{MM}月{DD}日 ({DDDD})" });
-			new Chronopic('input[type="datetime"][lang="nb"]', { locale: 'nb_NO', format: "{DDDD} {D}. {MMMM} {YYYY}" });
-			new Chronopic('input[type="datetime"][lang="nn"]', { locale: 'nn_NO', format: "{DDDD} {D}. {MMMM} {YYYY}" });
+			new Chronopic('input[type="datetime"][lang="ja"]', { locale: 'ja_JP', format: "{YYYY}年{MM}月{DD}日" });
+			new Chronopic('input[type="datetime"][lang="nb"]', { locale: 'nb_NO', format: "{D}. {MMMM} {YYYY}" });
+			new Chronopic('input[type="datetime"][lang="nn"]', { locale: 'nn_NO', format: "{D}. {MMMM} {YYYY}" });
 			new Chronopic('input[type="datetime"][lang="nl"]', { locale: 'nl_BE', format: "{D} {MMMM} {YYYY}" });
 			new Chronopic('input[type="datetime"][past]', { max: now });
 			new Chronopic('input[type="datetime"][future]', { min: now });
