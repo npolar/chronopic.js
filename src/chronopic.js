@@ -27,30 +27,37 @@
 			replace: null
 		});
 		
-		var parsed = (function(selector) {
-			var parsed = { attribs: {}, classes: [] };
-			selector.match(/(\[[^\]]+\]|#[^#.\[]+|\.[^#.\[]+|\w+)/g)
-			.forEach(function(m) {
-				(m[0] == "[" ? ((m = m.match(/^\[([^=\]]+)=?([^\]]+)?\]$/)) && (parsed.attribs[m[1]] = m[2] || "")) : // Attribute
-				(m[0] == "." ? parsed.classes.push(m.substr(1)) : // Class
-				(m[0] == "#" ? (parsed.attribs.id = m.substr(1)) : // ID
-				(parsed.tag = m)))); // Tag
+		var a, parsed, elem = (selector instanceof HTMLElement ? selector : null);
+		
+		if(typeof selector == "string") {
+			parsed = (function(selector, parsed) {
+				selector.match(/(\[[^\]]+\]|#[^#.\[]+|\.[^#.\[]+|\w+)/g)
+				.forEach(function(m) {
+					(m[0] == "[" ? ((m = m.match(/^\[([^=\]]+)=?([^\]]+)?\]$/)) && (parsed.attribs[m[1]] = m[2] || "")) : // Attribute
+					(m[0] == "." ? parsed.classes.push(m.substr(1)) : // Class
+					(m[0] == "#" ? (parsed.attribs.id = m.substr(1)) : // ID
+					(parsed.tag = m)))); // Tag
+				});
+				return parsed;
+			})(selector, { attribs: {}, classes: [] });
+			
+			// Create element from parsed string
+			elem = options.context.createElement(parsed.tag);
+			
+			// Add classes
+			parsed.classes.forEach(function(className) {
+				elem.classList.add(className);
 			});
-			return parsed;
-		})(selector), a, elem = options.context.createElement(parsed.tag);
+			
+			// Add attributes
+			for(a in parsed.attribs) {
+				(parsed.attribs.hasOwnProperty(a) && elem.setAttribute(a, parsed.attribs[a]));
+			}
+		}
 		
 		(this.element = elem).innerHTML = options.html;
 		this.parent = null;
-		
-		// Add classes
-		parsed.classes.forEach(function(className) {
-			elem.classList.add(className);
-		});
-		
-		// Add attributes
-		for(a in parsed.attribs) {
-			(parsed.attribs.hasOwnProperty(a) && elem.setAttribute(a, parsed.attribs[a]));
-		}
+		this.events = {};
 		
 		// Add element to DOM
 		if(options.replace) {
@@ -88,8 +95,20 @@
 			
 			return this;
 		},
-		on: function(event, callback) {
-			this.element.addEventListener(event, callback);
+		on: function(events, callback) {
+			(events instanceof Array ? events : [ events ])
+			.forEach(function(event) {
+				var self = this, fn = (typeof callback == "function" ? function(e) { callback.call(self, e); } : null);
+				(self.events[event] instanceof Array || (self.events[event] = []));
+				
+				if(fn) {
+					self.events[event].push(fn);
+					self.element.addEventListener(event, fn);
+				} else {
+					self.events[event].forEach(function(callback) { self.element.removeEventListener(event, callback); });
+					self.events[event] = [];
+				}
+			}, this);
 			return this;
 		}
 	};
@@ -261,7 +280,7 @@
 				self.instances.push((instance = {
 					date: new Date(date),
 					container: container,
-					element: element,
+					element: ε(element),
 					selected: {},
 					tables: tables,
 					value: "",
@@ -274,7 +293,7 @@
 						if(valid(this.date.getFullYear(), this.date.getMonth() + 1, value)) {
 							this.date.setDate(value);
 							this.selected.day = new Date(this.date);
-							this.value = this.element.value = ϝ(this.date, options.format, self.i18n);
+							this.value = element.value = ϝ(this.date, options.format, self.i18n);
 							this.hide();
 							
 							if(typeof options.onChange == 'function') {
@@ -398,7 +417,7 @@
 							(tables.hasOwnProperty(t) && tables[t].classes[(t == table ? "remove" : "add")]("hidden"));
 						}
 						
-						var container = this.container.element, elem = this.element;
+						var container = this.container.element, elem = element;
 						container.style.top = elem.offsetTop + elem.offsetHeight + "px";
 						container.style.left = elem.offsetLeft + "px";
 						
@@ -419,11 +438,11 @@
 				
 				((isObj(options.date) && (instance.day = instance.date.getDate())) || (element.value = ""));
 				
-				element.addEventListener("click", function(e) {
+				instance.element
+				.on("click", function(e) {
 					instance[(instance.visible ? "hide" : "show")]();
-				});
-				
-				element.addEventListener("change", function(e) {
+				})
+				.on("change", function(e) {
 					var format = options.format,
 						oldVal = instance.value,
 						newVal = e.target.value,
