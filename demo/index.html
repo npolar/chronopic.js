@@ -32,10 +32,10 @@
 		<input type="datetime" />
 
 		<script>
-			var now = new Date(), now = { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
+			var now = new Date();
 
-			new Chronopic('input[type="datetime"]', { date: now });
-			new Chronopic('input[type="datetime"][lang="ja"]', { locale: 'ja_JP', format: "{YYYY}年{MM}月{DD}日" });
+			new Chronopic('input[type="datetime"]', { date: new Date(), format: "{YYYY}-{MM}-{DD}, {HH}:{mm}" });
+			new Chronopic('input[type="datetime"][lang="ja"]', { locale: 'ja_JP', format: "{YYYY}年{MM}月{DD}日, {H}時{mm}分" });
 			new Chronopic('input[type="datetime"][lang="nb"]', { locale: 'nb_NO', format: "{D}. {MMMM} {YYYY}" });
 			new Chronopic('input[type="datetime"][lang="nn"]', { locale: 'nn_NO', format: "{D}. {MMMM} {YYYY}" });
 			new Chronopic('input[type="datetime"][lang="nl"]', { locale: 'nl_BE', format: "{D} {MMMM} {YYYY}" });
