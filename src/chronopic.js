@@ -320,6 +320,20 @@
 						
 						return this;
 					},
+					get hour() {
+						return this.date.getHours();
+					},
+					set hour(value) {
+						// TODO: check if valid (not disabled)
+						this.date.setHours(value);
+					},
+					get minute() {
+						return this.date.getMinutes();
+					},
+					set minute(value) {
+						// TODO: check if valid (not disabled)
+						this.date.setMinutes(value);
+					},
 					get month() {
 						return this.date.getMonth();
 					},
@@ -445,6 +459,13 @@
 						
 						return this;
 					},
+					get second() {
+						return this.date.getSeconds();
+					},
+					set second(value) {
+						// TODO: check if valid (not disabled)
+						this.date.setSeconds(value);
+					},
 					show: function(table) {
 						(table || (table = "day"));
 						this.rebuild(table);
@@ -491,13 +512,14 @@
 						beg = e.target.selectionStart,
 						val = e.target.value,
 						pos = 0, segs = [],
-						end, len;
+						end, len, inc;
 					
 					// 37:left, 38:up, 39:right, 40:down
 					if(key < 37 || key > 40) {
 						return;
 					}
-						
+					
+					// FIXME: Add support for NO separators
 					options.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
 						len = seg.length;
 						
@@ -524,14 +546,21 @@
 								beg = seg.beg;
 								end = seg.end;
 								seg = seg.seg;
+								inc = (key == 38 ? 1 : -1);
 								
 								if(/D{1,2}/.test(seg)) {
-									instance.day += (key == 38 ? 1 : -1);
+									instance.day += inc;
 								} else if(/M{1,4}/.test(seg)) {
-									instance.month += (key == 38 ? 1 : -1);
+									instance.month += inc;
 								} else if(/YY(YY)?/.test(seg)) {
-									instance.year += (key == 38 ? 1 : -1);
-								}
+									instance.year += inc;
+								} else if(/HH?/i.test(seg)) {
+									instance.hour += inc;
+								} else if(/mm?/.test(seg)) {
+									instance.minute += inc;
+								} else if(/ss?/.test(seg)) {
+									instance.second += inc;
+								} // TODO: Add support for am/pm
 								
 								end += ϝ(instance.date, seg, self.i18n).length - val.slice(beg, end).length;
 								instance.update().hide();
@@ -597,12 +626,12 @@
 						return;
 					}
 					
-					(a && a == "㏘" && (h += 12));
-					(y !== undefined && (instance.year = y));
-					(m !== undefined && (instance.month = m - 1));
-					(d !== undefined && (instance.day = d));
-					
-					// TODO: hours, minutes, seconds
+					(isNum(s) && (instance.second = s));
+					(isNum(n) && (instance.minute = n));
+					(isNum(h) && (instance.hour = h));
+					(isNum(d) && (instance.day = d));
+					(isNum(m) && (instance.month = m - 1));
+					(isNum(y) && (instance.year = y));
 				});
 				
 				document.addEventListener("click", function(e, node) {
