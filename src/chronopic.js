@@ -266,7 +266,7 @@
 					parent.instances.forEach(function(child, index, array) {
 						if(child.element.element == element) {
 							// Clear events and remove instance if previously defined by different selector
-							child.element.on([ "click", "change" ], null);
+							child.element.on([ "click", "change", "keyup" ], null);
 							array.splice(index, 1);
 						}
 					});
@@ -303,12 +303,6 @@
 						if(valid(this.date.getFullYear(), this.date.getMonth() + 1, value)) {
 							this.date.setDate(value);
 							this.selected.day = new Date(this.date);
-							this.value = element.value = ϝ(this.date, options.format, self.i18n);
-							this.hide();
-							
-							if(typeof options.onChange == 'function') {
-								options.onChange(element, this.date);
-							}
 						}
 					},
 					hide: function() {
@@ -323,16 +317,16 @@
 							this.date = new Date(this.selected.day);
 							this.selected.month = new Date(this.date);
 						}
+						
+						return this;
 					},
 					get month() {
 						return this.date.getMonth();
 					},
 					set month(value) {
 						if(valid(this.date.getFullYear(), value + 1)) {
-							this.date.setDate(1);
 							this.date.setMonth(value);
 							this.selected.month = new Date(this.date);
-							this.show("day");
 						}
 					},
 					rebuild: function(table) {
@@ -346,11 +340,23 @@
 							instance.tables.day.head.add([
 								ε("tr.title").add([
 									ε("th.prev[title=" + self.locale.prevMonth + "]", { html: "&lt;" })
-									.on("click", function(e) { instance.month--; e.stopPropagation(); }),
+									.on("click", function(e) {
+										instance.date.setDate(1);
+										instance.month--;
+										instance.show("day");
+										e.stopPropagation();
+									}),
 									ε("th[colspan=6][title=" + self.locale.selectMonth + "]", { html: ϝ(instance.date, self.locale.formatMonth, self.locale) })
-									.on("click", function() { instance.show("month"); }),
+									.on("click", function() {
+										instance.show("month");
+									}),
 									ε("th.next[title=" + self.locale.nextMonth + "]", { html: "&gt;" })
-									.on("click", function(e) { instance.month++; e.stopPropagation(); })
+									.on("click", function(e) {
+										instance.date.setDate(1);
+										instance.month++;
+										instance.show("day")
+										e.stopPropagation();
+									})
 								]),
 								(lables = ε("tr.labels").add(ε("th.week", { html: self.locale.week })))
 							], true);
@@ -377,7 +383,11 @@
 									(δ(col).compare(now) >= 3 && (classNames += ".now"));
 									
 									tr.add((elem = ε("td[title=" + ϝ(col, self.locale.formatDay, self.locale) + "]" + classNames, { html: col.getDate() })));
-									(!disabled && elem.on("click", function() { instance.month = col.getMonth(), instance.day = col.getDate(); }));
+									(!disabled && elem.on("click", function() {
+										instance.month = col.getMonth(),
+										instance.day = col.getDate();
+										instance.update().hide();
+									}));
 								});
 							});
 						}
@@ -386,13 +396,26 @@
 							instance.tables.month.head.add([
 								ε("tr.title").add([
 									ε("th.prev[title=" + self.locale.prevYear + "]", { html: "&lt;" })
-									.on("click", function(e) { instance.year--; e.stopPropagation(); }),
+									.on("click", function(e) {
+										instance.year--;
+										instance.show("month");
+										e.stopPropagation();
+									}),
 									ε("th.year[colspan=6][title=" + self.locale.year + "]").add(
 										ε("input[type=number][step=1][min=" + (self.min.year || 0) + "][max=" + (self.max.year || 9999) + "][value=" + instance.year + "]")
-										.on("change", function(e, v) { (isNum((v = Number(e.target.value))) && (instance.year = v)); })
+										.on("change", function(e, v) {
+											if(isNum((v = Number(e.target.value)))) {
+												instance.year = v;
+												instance.show("month");
+											}
+										})
 									),
 									ε("th.next[title=" + self.locale.nextYear + "]", { html: "&gt;" })
-									.on("click", function(e) { instance.year++; e.stopPropagation(); })
+									.on("click", function(e) {
+										instance.year++;
+										instance.show("month");
+										e.stopPropagation();
+									})
 								]),
 							], true);
 							
@@ -411,7 +434,11 @@
 									(δ(col).compare(now) >= 2 && (classNames += ".now"));
 									
 									tr.add((elem = ε("td[colspan=2][title=" + self.locale.monthName[month] + "]" + classNames, { html: self.locale.monthNameShort[month] })));
-									(!disabled && elem.on("click", function() { instance.month = month; }));
+									(!disabled && elem.on("click", function() {
+										instance.date.setDate(1);
+										instance.month = month;
+										instance.show("day");
+									}));
 								});
 							});
 						}
@@ -435,32 +462,93 @@
 							container.style.width = elem.offsetWidth + "px";
 						}
 					},
+					update: function() {
+						this.value = element.value = ϝ(this.date, options.format, self.i18n);
+						this.selected.day = new Date(this.date);
+						
+						if(typeof options.onChange == 'function') {
+							options.onChange(element, this.date);
+						}
+						
+						return this;
+					},
 					get year() {
 						return this.date.getFullYear();
 					},
 					set year(value) {
-						if(valid(value)) {
-							this.date.setFullYear(value);
-							this.show("month");
-						}
+						(valid(value) && this.date.setFullYear(value));
 					}
 				}));
 				
-				((isObj(options.date) && (instance.day = instance.date.getDate())) || (element.value = ""));
+				((isObj(options.date) && instance.update()) || (element.value = ""));
 				
 				instance.element
 				.on("click", function(e) {
 					instance[(instance.visible ? "hide" : "show")]();
 				})
+				.on("keyup", function(e) {
+					var key = e.keyCode,
+						beg = e.target.selectionStart,
+						val = e.target.value,
+						pos = 0, segs = [],
+						end, len;
+					
+					// 37:left, 38:up, 39:right, 40:down
+					if(key < 37 || key > 40) {
+						return;
+					}
+						
+					options.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
+						len = seg.length;
+						
+						if(/^\{(.*)\}$/.test(seg)) {
+							segs.push({
+								seg: seg,
+								beg: pos,
+								end: pos + (len = (++idx < arr.length ? val.slice(pos, val.indexOf(arr[idx], pos)).length : val.slice(pos).length))
+							});
+						}
+						
+						pos += len;
+					});
+					
+					segs.forEach(function(seg, idx, arr) {
+						if(!end && beg >= seg.beg && beg <= seg.end) {
+							if(key == 37) {
+								beg = (--idx >= 0 ? arr[idx].beg : seg.beg);
+								end = (idx >= 0 ? arr[idx].end : seg.end);
+							} else if(key == 39) {
+								beg = (++idx < arr.length ? arr[idx].beg : seg.beg);
+								end = (idx < arr.length ? arr[idx].end : seg.end);
+							} else if(key == 38 || key == 40) {
+								beg = seg.beg;
+								end = seg.end;
+								seg = seg.seg;
+								
+								if(/D{1,2}/.test(seg)) {
+									instance.day += (key == 38 ? 1 : -1);
+								} else if(/M{1,4}/.test(seg)) {
+									instance.month += (key == 38 ? 1 : -1);
+								} else if(/YY(YY)?/.test(seg)) {
+									instance.year += (key == 38 ? 1 : -1);
+								}
+								
+								end += ϝ(instance.date, seg, self.i18n).length - val.slice(beg, end).length;
+								instance.update().hide();
+							}
+						}
+					});
+					
+					e.target.selectionStart = beg;
+					e.target.selectionEnd = end || beg;
+				})
 				.on("change", function(e) {
-					var format = options.format,
-						oldVal = instance.value,
-						newVal = e.target.value,
+					var newVal = e.target.value,
 						valPos = 0,
 						status = true,
 						d, m, y, h, n, s, a;
 					
-					format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
+					options.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
 						if(status) {
 							if(/^\{(.*)\}$/.test(seg)) {
 								var val = newVal.slice(valPos);
@@ -504,7 +592,7 @@
 					});
 					
 					if(!status) {
-						e.target.value = oldVal;
+						e.target.value = instance.value;
 						return;
 					}
 					
