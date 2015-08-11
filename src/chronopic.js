@@ -98,7 +98,7 @@
 		on: function(events, callback) {
 			(events instanceof Array ? events : [ events ])
 			.forEach(function(event) {
-				var self = this, fn = (typeof callback == "function" ? function(e) { callback.call(self, e); } : null);
+				var self = this, fn = (typeof callback == "function" ? function(e) { return callback.call(self, e); } : null);
 				(self.events[event] instanceof Array || (self.events[event] = []));
 				
 				if(fn) {
@@ -266,7 +266,7 @@
 					parent.instances.forEach(function(child, index, array) {
 						if(child.element.element == element) {
 							// Clear events and remove instance if previously defined by different selector
-							child.element.on([ "click", "change", "keyup" ], null);
+							child.element.on([ "click", "change", "keydown" ], null);
 							array.splice(index, 1);
 						}
 					});
@@ -486,7 +486,7 @@
 				.on("click", function(e) {
 					instance[(instance.visible ? "hide" : "show")]();
 				})
-				.on("keyup", function(e) {
+				.on("keydown", function(e) {
 					var key = e.keyCode,
 						beg = e.target.selectionStart,
 						val = e.target.value,
@@ -539,6 +539,7 @@
 						}
 					});
 					
+					e.preventDefault();
 					e.target.selectionStart = beg;
 					e.target.selectionEnd = end || beg;
 				})
