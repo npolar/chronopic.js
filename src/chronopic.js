@@ -481,7 +481,7 @@
 						container.style.top = elem.offsetTop + elem.offsetHeight + "px";
 						container.style.left = elem.offsetLeft + "px";
 						
-						if(container.offsetWidth < elem.offsetWidth) {
+						if(container.offsetWidth != elem.offsetWidth) {
 							container.style.width = elem.offsetWidth + "px";
 						}
 					},
@@ -697,6 +697,14 @@
 	};
 	
 	if(typeof window != "undefined") {
+		window.addEventListener("resize", function(e) {
+			_.instances.forEach(function(instance) {
+				instance.instances.forEach(function(instance) {
+					(instance.visible && (instance.show()));
+				});
+			});
+		});
+		
 		window.Chronopic = _;
 	}
 	
