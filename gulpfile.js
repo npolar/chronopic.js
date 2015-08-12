@@ -9,14 +9,14 @@ gulp.task('minify-js', function() {
 	return gulp.src('src/chronopic.js')
 	.pipe(uglify())
 	.pipe(rename(function(path) { path.basename += ".min" }))
-	.pipe(gulp.dest('./dist'));
+	.pipe(gulp.dest('./dist/js'));
 });
 
 gulp.task('minify-i18n', function() {
 	return gulp.src('src/i18n/*.js')
 	.pipe(uglify())
 	.pipe(rename(function(path) { path.basename += ".min" }))
-	.pipe(gulp.dest('./dist/i18n'));
+	.pipe(gulp.dest('./dist/js/chronopic-i18n'));
 });
 
 gulp.task('minify-css', function() {
