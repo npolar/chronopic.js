@@ -216,7 +216,7 @@
 			className: "chronopic",
 			date: null,
 			format: "{YYYY}-{MM}-{DD}",
-			locale: "en_GB",
+			locale: null,
 			max: { year: 2100 },
 			min: { year: 1900 },
 			onChange: null
@@ -654,7 +654,7 @@
 			}
 		}, this);
 		
-		this.locale = options.locale;
+		this.locale = (options.locale || (navigator ? (navigator.userLanguage || navigator.language).replace("-", "_") : null));
 		_.instances.push(this);
 	}
 	
