@@ -16,4 +16,6 @@
 		week:			"週",
 		year:			"年"
 	};
+	
+	Chronopic.i18n.ja = Chronopic.i18n.ja_JP;
 })();

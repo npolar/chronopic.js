@@ -16,4 +16,6 @@
 		week:			"week",
 		year:			"jaar"
 	};
+	
+	Chronopic.i18n.nl = Chronopic.i18n.nl_NL;
 })();

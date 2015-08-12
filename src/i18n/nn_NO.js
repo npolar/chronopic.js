@@ -16,4 +16,6 @@
 		week:			"Veke",
 		year:			"År"
 	};
+	
+	Chronopic.i18n.nn = Chronopic.i18n.nn_NO;
 })();

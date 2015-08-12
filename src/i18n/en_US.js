@@ -16,4 +16,6 @@
 		week:			"Week",
 		year:			"Year"
 	};
+	
+	Chronopic.i18n.en = Chronopic.i18n.en_US;
 })();

@@ -16,4 +16,6 @@
 		week:			"Uke",
 		year:			"År"
 	};
+	
+	Chronopic.i18n.nb = Chronopic.i18n.nb_NO;
 })();
