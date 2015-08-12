@@ -536,17 +536,20 @@
 					
 					segs.forEach(function(seg, idx, arr) {
 						if(!end && beg >= seg.beg && beg <= seg.end) {
-							if(key == 37) {
+							if(e.target.selectionEnd == beg) {
+								beg = seg.beg;
+								end = seg.end;
+							} else if(key == 37) {	// Left
 								beg = (--idx >= 0 ? arr[idx].beg : seg.beg);
 								end = (idx >= 0 ? arr[idx].end : seg.end);
-							} else if(key == 39) {
+							} else if(key == 39) {	// Right
 								beg = (++idx < arr.length ? arr[idx].beg : seg.beg);
 								end = (idx < arr.length ? arr[idx].end : seg.end);
-							} else if(key == 38 || key == 40) {
+							} else if((inc = (key == 38)) || key == 40) {
 								beg = seg.beg;
 								end = seg.end;
 								seg = seg.seg;
-								inc = (key == 38 ? 1 : -1);
+								inc = (inc ? 1 : -1);
 								
 								if(/D{1,2}/.test(seg)) {
 									instance.day += inc;
@@ -563,7 +566,8 @@
 								} // TODO: Add support for am/pm
 								
 								end += ϝ(instance.date, seg, self.i18n).length - val.slice(beg, end).length;
-								instance.update().hide();
+								instance.update();
+								(instance.visible && instance.show());
 							}
 						}
 					});
@@ -632,6 +636,9 @@
 					(isNum(d) && (instance.day = d));
 					(isNum(m) && (instance.month = m - 1));
 					(isNum(y) && (instance.year = y));
+					
+					instance.update();
+					(instance.visible && instance.show());
 				});
 				
 				document.addEventListener("click", function(e, node) {
