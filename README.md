@@ -27,8 +27,8 @@ Key           | Value                                       | Default
 **date**      | Pre-selected date object (or *null*)        | *null*
 **format**    | Output format                               | *{YYYY}-{MM}-{DD}*
 **locale**    | Name of locale being used                   | *en_GB*
-**max**       | Object describing the maximum date          | *{ year: 9999 }*
-**min**       | Object describing the minimum date          | *{ year: 0 }*
+**max**       | Date or object describing the maximum date	| *{ year: 2100 }*
+**min**       | Date or object describing the minimum date	| *{ year: 1900 }*
 **onChange**  | Callback function when value changes        | *null*
 
 ### Format values:

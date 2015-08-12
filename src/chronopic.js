@@ -217,8 +217,8 @@
 			date: null,
 			format: "{YYYY}-{MM}-{DD}",
 			locale: "en_GB",
-			max: { year: 9999 },
-			min: { year: 0 },
+			max: { year: 2100 },
+			min: { year: 1900 },
 			onChange: null
 		});
 		
@@ -229,6 +229,8 @@
 		
 		var self = this, date = new Date();
 		(isObj(options.date) && (date = ((date = options.date) instanceof Date ? new Date(date) : new Date(date.year, date.month - 1, date.day))));
+		(self.max instanceof Date && (self.max = { year: self.max.getFullYear(), month: self.max.getMonth() + 1, day: self.max.getDate() }));
+		(self.min instanceof Date && (self.min = { year: self.min.getFullYear(), month: self.min.getMonth() + 1, day: self.min.getDate() }));
 		
 		function valid(year, month, day) {
 			var days, min = self.min, max = self.max;
