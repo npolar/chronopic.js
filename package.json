@@ -9,7 +9,7 @@
     "time",
     "widget"
   ],
-  "main": "chronopic.min.js",
+  "main": "dist/js/chronopic.min.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/npolar/chronopic.js.git"
