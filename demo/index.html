@@ -30,6 +30,7 @@
 		<input type="datetime" lang="nl" placeholder="Dutch" />
 		<input type="datetime" past placeholder="past only" />
 		<input type="datetime" future placeholder="future only" />
+		<input type="datetime" twentyfifteen placeholder="2015 only" />
 		<input type="datetime" style="width: 100%;" />
 
 		<script>
@@ -42,6 +43,7 @@
 			new Chronopic('input[type="datetime"][lang="nl"]', { locale: 'nl', format: "{D} {MMMM} {YYYY}" });
 			new Chronopic('input[type="datetime"][past]', { max: now });
 			new Chronopic('input[type="datetime"][future]', { min: now });
+			new Chronopic('input[type="datetime"][twentyfifteen]', { min: { year: 2015 }, max: { year: 2015 } });
 		</script>
 	</body>
 </html>
