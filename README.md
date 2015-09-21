@@ -21,15 +21,15 @@ new Chronopic('input[type="date"][lang="no"]', { locale: 'nb_NO' });
 ```
 
 ### Constructor options:
-Key           | Value                                       | Default
---------------|---------------------------------------------|--------------
-**className** | CSS Class Name added to container           | *chronopic*
-**date**      | Pre-selected date object (or *null*)        | *null*
-**format**    | Output format                               | *{YYYY}-{MM}-{DD}*
-**locale**    | Name of locale or *null* for browser locale | *null*
-**max**       | Date or object describing the maximum date  | *{ year: 2100 }*
-**min**       | Date or object describing the minimum date  | *{ year: 1900 }*
-**onChange**  | Callback function when value changes        | *null*
+Key           | Value                                                         | Default
+--------------|---------------------------------------------------------------|--------------
+**className** | Dot-separated CSS class names added to container              | *.chronopic*
+**date**      | Pre-selected date object (or *null*)                          | *null*
+**format**    | Output format                                                 | *{YYYY}-{MM}-{DD}*
+**locale**    | Name of locale or *null* for browser locale                   | *null*
+**max**       | Date or object describing the maximum date                    | *{ year: 2100 }*
+**min**       | Date or object describing the minimum date                    | *{ year: 1900 }*
+**onChange**  | Callback *function(element, value)* called when value changes | *null*
 
 ### Format values:
 Code          | Replaced with
