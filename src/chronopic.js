@@ -233,9 +233,16 @@
 		(self.min instanceof Date && (self.min = { year: self.min.getFullYear(), month: self.min.getMonth() + 1, day: self.min.getDate() }));
 		
 		function valid(year, month, day) {
-			var days, min = self.min, max = self.max;
+			var days, min = self.min, max = self.max, fixed;
+			
 			while(day > (days = δ(new Date(year, month, day)).days)) { ++month; day -= day - days; }
 			while(month > 12) { ++year; month -= 12; }
+			
+			if(!isNaN((fixed = new Date(year, month - 1, isNaN(day) ? 1 : day)))) {
+				year = fixed.getFullYear();
+				month = fixed.getMonth() + 1;
+				day = fixed.getDate();
+			}
 			
 			if(isNum(year)) {
 				if((isNum(min.year) && year < min.year)
