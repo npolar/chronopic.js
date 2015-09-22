@@ -1,59 +1,74 @@
-.chronopic-md {
-  z-index     : 9999;
-  font-family : Roboto, 'Helvetica Neue', sans-serif;
-  color       : rgba(0,0,0,0.54);
+.chronopic-ext-md
+{
+  z-index: 9999;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  color: rgba(0,0,0,0.54);
 }
 
-.chronopic-md table {
+.chronopic-ext-md table
+{
   max-width: 340px;
   box-shadow: 0 3px 1px -2px rgba(0,0,0,.14),0 2px 2px 0 rgba(0,0,0,.098),0 1px 5px 0 rgba(0,0,0,.084);
   border-radius: 0;
 }
 
-.chronopic-md table tr.title {
+.chronopic-ext-md table tr.title
+{
   height: 40px;
 }
 
-.chronopic-md table tr.labels {
-  height           : 40px;
-  background-color : rgb(238,238,238);
+.chronopic-ext-md table tr.labels
+{
+  height: 40px;
+  background-color: rgb(238,238,238);
 }
 
-.chronopic-md th.week, .chronopic-md th.day {
+.chronopic-ext-md th.week,
+.chronopic-ext-md th.day
+{
   border-bottom: 1px solid rgb(224, 224, 224);
 }
 
-.chronopic-md td {
-  width  : 40px;
-  height : 40px;
+.chronopic-ext-md td
+{
+  width: 40px;
+  height: 40px;
 }
 
-.chronopic-md td.selected {
-  background-color : rgb(16,108,200);
+.chronopic-ext-md td.selected
+{
+  background-color: rgb(16,108,200);
   color: #fff;
-  border-radius    : 200px;
+  border-radius: 200px;
 }
 
-.chronopic-md td.day:hover {
-  background-color : rgb(224,224,224);
-  border-radius    : 200px;
+.chronopic-ext-md td.day:hover
+{
+  background-color: rgb(224,224,224);
+  border-radius: 200px;
 }
 
-.chronopic-md td.week, .chronopic-md th.week {
+.chronopic-ext-md td.week,
+.chronopic-ext-md th.week
+{
   background-color: rgb(238,238,238);
   border-right: 1px solid rgb(224, 224, 224);
   color: rgba(0,0,0,0.54);
 }
 
-.chronopic-md td.month {
+.chronopic-ext-md td.month
+{
   border-radius: 5px;
 }
 
-.chronopic-md th.year input {
-  color : rgba(0,0,0,0.54) !important;
+.chronopic-ext-md th.year input
+{
+  color: rgba(0,0,0,0.54) !important;
 }
 
-.chronopic-md thead .title th:not(.disabled):not(.selected):not(.year):hover {
+.chronopic-ext-md thead .title th:not(.disabled):not(.selected):not(.year):hover
+{
   background-color: rgb(16,108,200);
   color: #fff;
 }
+
