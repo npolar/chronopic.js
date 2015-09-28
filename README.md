@@ -25,33 +25,35 @@ Key           | Value                                                         | 
 --------------|---------------------------------------------------------------|--------------
 **className** | Dot-separated CSS class names added to container              | *.chronopic*
 **date**      | Pre-selected date object (or *null*)                          | *null*
-**format**    | Output format                                                 | *{YYYY}-{MM}-{DD}*
+**format**    | Output format as a string (see format values below)           | *{date}*
 **locale**    | Name of locale or *null* for browser locale                   | *null*
 **max**       | Date or object describing the maximum date                    | *{ year: 2100 }*
 **min**       | Date or object describing the minimum date                    | *{ year: 1900 }*
 **onChange**  | Callback *function(element, value)* called when value changes | *null*
 
 ### Format values:
-Code          | Replaced with
---------------|--------------
-**{YYYY}**    | Year (four digits)
-**{YY}**      | Year (two digits)
-**{MMMM}**    | Month (full name)
-**{MMM}**     | Month (short name)
-**{MM}**      | Month (two digits)
-**{M}**       | Month (one or two digits)
-**{DDDD}**    | Day of week (full name)
-**{DDD}**     | Day of week (short name)
-**{DD}**      | Day of month (two digits)
-**{D}**       | Day of month (one or two digits)
-**{HH}**      | Hour (two digits, 24-hour format)
-**{H}**       | Hour (one or two digits, 24-hour format)
-**{hh}**      | Hour (two digits, 12-hour format)
-**{h}**       | Hour (one or two digits, 12-hour format)
-**{mm}**      | Minute (two digits)
-**{m}**       | Minute (one or two digits)
-**{ss}**      | Second (two digits)
-**{s}**       | Second (one or two digits)
-**{ap}**      | Day meridian (a.m. or p.m.)
-**{ww}**      | Week number (two digits)
-**{w}**       | Week number (one or two digits)
+Code            | Replaced with
+----------------|--------------
+**{date}**      | Locale specific date format (date, month, year)
+**{datetime}**  | Locale specific date/time format (date, month, year, time)
+**{YYYY}**      | Year (four digits)
+**{YY}**        | Year (two digits)
+**{MMMM}**      | Month (full name)
+**{MMM}**       | Month (short name)
+**{MM}**        | Month (two digits)
+**{M}**         | Month (one or two digits)
+**{DDDD}**      | Day of week (full name)
+**{DDD}**       | Day of week (short name)
+**{DD}**        | Day of month (two digits)
+**{D}**         | Day of month (one or two digits)
+**{HH}**        | Hour (two digits, 24-hour format)
+**{H}**         | Hour (one or two digits, 24-hour format)
+**{hh}**        | Hour (two digits, 12-hour format)
+**{h}**         | Hour (one or two digits, 12-hour format)
+**{mm}**        | Minute (two digits)
+**{m}**         | Minute (one or two digits)
+**{ss}**        | Second (two digits)
+**{s}**         | Second (one or two digits)
+**{ap}**        | Day meridian (a.m. or p.m.)
+**{ww}**        | Week number (two digits)
+**{w}**         | Week number (one or two digits)
