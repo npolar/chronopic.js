@@ -154,9 +154,11 @@
 			s = date.getSeconds(),
 			w = δ(date).week,
 			wd = date.getDay(),
-			ap = h < 12 ? "㏂" : "㏘";
+			ap = h < 12 ? locale.anteMeridiem : locale.postMeridiem;
 			
 		return format
+		.replace(/{date}/gi, locale.formatDate)
+		.replace(/{datetime}/gi, locale.formatDateTime)
 		.replace(/{ww}/gi, ("0" + w).slice(-2))
 		.replace(/{w}/gi, w)
 		.replace(/{DDDD}/g, locale.dayOfWeek[wd])
@@ -215,17 +217,19 @@
 		options = parseOptions(options, {
 			className: "chronopic",
 			date: null,
-			format: "{YYYY}-{MM}-{DD}",
+			format: "{date}",
 			locale: null,
 			max: { year: 2100 },
 			min: { year: 1900 },
 			onChange: null
 		});
 		
+		this.format = options.format;
 		this.instances = [];
-		this.i18n = _.i18n.en_GB;
 		this.max = (isObj(options.max) ? options.max : {});
 		this.min = (isObj(options.min) ? options.min : {});
+		
+		this._i18n = _.i18n.en_GB;
 		
 		var self = this, date = new Date();
 		(isObj(options.date) && (date = ((date = options.date) instanceof Date ? new Date(date) : new Date(date.year, date.month - 1, date.day))));
@@ -369,7 +373,7 @@
 										instance.show("day");
 										e.stopPropagation();
 									}),
-									ε("th[colspan=6][title=" + self.locale.selectMonth + "]", { html: ϝ(instance.date, self.locale.formatMonth, self.locale) })
+									ε("th[colspan=6][title=" + self.locale.selectMonth + "]", { html: ϝ(instance.date, self.locale.titleMonth, self.locale) })
 									.on("click", function() {
 										instance.show("month");
 									}),
@@ -405,7 +409,7 @@
 									(disabled && (classNames += ".disabled"));
 									(δ(col).compare(now) >= 3 && (classNames += ".now"));
 									
-									tr.add((elem = ε("td[title=" + ϝ(col, self.locale.formatDay, self.locale) + "]" + classNames, { html: col.getDate() })));
+									tr.add((elem = ε("td[title=" + ϝ(col, self.locale.titleDay, self.locale) + "]" + classNames, { html: col.getDate() })));
 									(!disabled && elem.on("click", function() {
 										instance.month = col.getMonth(),
 										instance.day = col.getDate();
@@ -493,7 +497,7 @@
 						}
 					},
 					update: function() {
-						this.value = element.value = ϝ(this.date, options.format, self.i18n);
+						this.value = element.value = ϝ(this.date, self.format, self._i18n);
 						this.selected.day = new Date(this.date);
 						
 						if(typeof options.onChange == 'function') {
@@ -529,7 +533,7 @@
 					}
 					
 					// FIXME: Add support for NO separators
-					options.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
+					self.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
 						len = seg.length;
 						
 						if(/^\{(.*)\}$/.test(seg)) {
@@ -572,9 +576,11 @@
 									instance.minute += inc;
 								} else if(/ss?/.test(seg)) {
 									instance.second += inc;
-								} // TODO: Add support for am/pm
+								} else if(/ap/.test(seg)) {
+									instance.hour += (12 * inc);
+								}
 								
-								end += ϝ(instance.date, seg, self.i18n).length - val.slice(beg, end).length;
+								end += ϝ(instance.date, seg, self._i18n).length - val.slice(beg, end).length;
 								instance.update();
 								(instance.visible && instance.show());
 							}
@@ -590,8 +596,8 @@
 						valPos = 0,
 						status = true,
 						d, m, y, h, n, s, a;
-					
-					options.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
+						
+					self.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
 						if(status) {
 							if(/^\{(.*)\}$/.test(seg)) {
 								var val = newVal.slice(valPos);
@@ -602,12 +608,12 @@
 								if(seg == "DD" || seg == "D") {
 									d = Number(val);
 								} else if(seg == "MMMM") {
-									self.i18n.monthName.forEach(function(monthName, monthNumber) {
+									self._i18n.monthName.forEach(function(monthName, monthNumber) {
 										(!m && val == monthName && (m = monthNumber + 1));
 									});
 									(m || (status = false));
 								} else if(seg == "MMM") {
-									self.i18n.monthNameShort.forEach(function(monthName, monthNumber) {
+									self._i18n.monthNameShort.forEach(function(monthName, monthNumber) {
 										(!m && val == monthName && (m = monthNumber + 1));
 									});
 									(m || (status = false));
@@ -622,7 +628,7 @@
 								} else if(seg == "s" || seg == "s") {
 									s = Number(val);
 								} else if(seg == "ap") {
-									((a = val) != "㏂" && a != "㏘" && (status = false));
+									((a = val) != self._i18n.anteMeridiem && a != self._i18n.postMeridiem && (status = false));
 								} else {
 									status = false;
 								}
@@ -665,19 +671,33 @@
 		_.instances.push(this);
 	}
 	
-	_.VERSION = 0.11;
+	_.VERSION = 0.13;
 	_.instances = [];
 	
 	_.prototype = {
+		get format() {
+			switch(this._fmt) {
+				case "{date}":		return this._i18n.formatDate;
+				case "{datetime}":	return this._i18n.formatDateTime;
+			}
+			return (typeof this._fmt == "string" ? this._fmt : "");
+		},
+		set format(value) {
+			this._fmt = (typeof value == "string" ? value : "");
+		},
 		get locale() {
-			return this.i18n;
+			return this._i18n;
 		},
 		set locale(value) {
-			if(_.i18n[value] && (_.i18n[value] !== this.i18n)) {
-				this.i18n = _.i18n[value];
+			if(_.i18n[value] && (_.i18n[value] !== this._i18n)) {
+				this._i18n = _.i18n[value];
 				
 				this.instances.forEach(function(instance) {
-					(instance.selected.day && (instance.day = instance.date.getDate()));
+					if(instance.selected.day) {
+						instance.day = instance.date.getDate();
+						instance.update()
+					}
+					
 					instance.rebuild();
 				});
 			}
@@ -686,19 +706,23 @@
 	
 	_.i18n = {
 		en_GB: {
+			anteMeridiem:	"㏂",
 			dayOfWeek:		[ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
 			dayOfWeekShort:	[ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
 			disabled:		"Disabled",
-			formatDay:		"{DDDD} {D} {MMMM} {YYYY}",
-			formatMonth:	"{MMMM} {YYYY}",
+			formatDate:		"{D} {MMMM} {YYYY}",
+			formatDateTime:	"{D} {MMMM} {YYYY}, {h}:{mm} {ap}",
 			month:			"Month",
 			monthName:		[ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
 			monthNameShort:	[ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
 			nextMonth:		"Next month",
 			nextYear:		"Next year",
+			postMeridiem:	"㏘",
 			prevMonth:		"Previous month",
 			prevYear:		"Previous year",
 			selectMonth:	"Select month",
+			titleDay:		"{DDDD} {D} {MMMM} {YYYY}",
+			titleMonth:		"{MMMM} {YYYY}",
 			week:			"Week",
 			year:			"Year"
 		}
