@@ -1,12 +1,22 @@
 (function() {
-	function isObj(value) {
-		return (typeof value == "object" && value);
-	}
+	"use strict";
 	
+	// Function used to check if a variable is a valid number
 	function isNum(value) {
 		return (typeof value == "number" && !isNaN(value) && Math.abs(value) < Infinity);
 	}
 	
+	// Function used to check if a variable is a valid object
+	function isObj(value) {
+		return (typeof value == "object" && value);
+	}
+	
+	// Function used to check if a variable is a valid string
+	function isStr(value) {
+		return (typeof value == "string" && value);
+	}
+	
+	// Function used to parse a map of option variables and set default values
 	function parseOptions(options, defaults) {
 		(isObj(options) || (options = {}));
 		
@@ -17,6 +27,7 @@
 		return options;
 	}
 	
+	// DOM Element helper class for easy DOM manipulation
 	function Element(selector, options) {
 		options = parseOptions(options, {
 			appendTo: null,
@@ -29,7 +40,7 @@
 		
 		var a, parsed, elem = (selector instanceof HTMLElement ? selector : null);
 		
-		if(typeof selector == "string") {
+		if(isStr(selector)) {
 			parsed = (function(selector, parsed) {
 				selector.match(/(\[[^\]]+\]|#[^#.\[]+|\.[^#.\[]+|\w+)/g)
 				.forEach(function(m) {
@@ -113,8 +124,10 @@
 		}
 	};
 	
+	// JavaScript Date object wrapper for additional functionality
 	function δ(date) {
 		return {
+			// Function used to compare date objects and return a number between 0 (unequal) and 6 (equal to the second)
 			compare: function(arg) {
 				var result = 0, f, fragments = [ "getFullYear", "getMonth", "getDate", "getHours", "getMinutes", "getSeconds" ];
 				
@@ -126,12 +139,15 @@
 				
 				return result;
 			},
+			// Number of days in current month
 			get days() {
 				return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 			},
+			// First day of the week in current month
 			get firstDay() {
 				return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
 			},
+			// ISO-8601 week number of current date
 			get week() {
 				var d = new Date(date);
 				d.setHours(0, 0, 0);
@@ -141,10 +157,12 @@
 		};
 	}
 	
+	// Alias to create a new Element instance
 	function ε(selector, options) {
 		return new Element(selector, options);
 	}
 	
+	// Function used to parse a formatted string based on specified locale
 	function ϝ(date, format, locale) {
 		var d = date.getDate(),
 			m = date.getMonth(),
@@ -182,6 +200,7 @@
 		.replace(/{ap}/g, ap);
 	}
 	
+	// Function used to create a table of days based on specified year and month
 	function dayTable(year, month) {
 		var firstDay = δ(new Date(year, month)).firstDay || 7,
 			current = new Date(year, month, 1 - ((firstDay - 1) || 7)),
@@ -199,6 +218,7 @@
 		return table;
 	}
 	
+	// Function used to create a table of months based on specified year
 	function monthTable(year) {
 		var row, col, table = [];
 		
@@ -213,7 +233,9 @@
 		return table;
 	}
 	
+	// Chronopic main class
 	function _(selector, options) {
+		// Constructor options and defaults
 		options = parseOptions(options, {
 			className: "chronopic",
 			date: null,
@@ -224,18 +246,23 @@
 			onChange: null
 		});
 		
+		// Public properties
 		this.format = options.format;
 		this.instances = [];
 		this.max = (isObj(options.max) ? options.max : {});
 		this.min = (isObj(options.min) ? options.min : {});
 		
+		// Private properties
 		this._i18n = _.i18n.en_GB;
 		
 		var self = this, date = new Date();
 		(isObj(options.date) && (date = ((date = options.date) instanceof Date ? new Date(date) : new Date(date.year, date.month - 1, date.day))));
+		
+		// Parse minimum and maximum dates from options
 		(self.max instanceof Date && (self.max = { year: self.max.getFullYear(), month: self.max.getMonth() + 1, day: self.max.getDate() }));
 		(self.min instanceof Date && (self.min = { year: self.min.getFullYear(), month: self.min.getMonth() + 1, day: self.min.getDate() }));
 		
+		// Function used to check if a specified date is within a valid range
 		function valid(year, month, day) {
 			var days, min = self.min, max = self.max, fixed;
 			
@@ -272,7 +299,8 @@
 			return true;
 		}
 		
-		(typeof selector == "string" ? Array.prototype.slice.call(document.querySelectorAll(selector)) : [ selector ])
+		// Inject Chronpic in DOM Elements from constructor selector parameter
+		(isStr(selector) ? Array.prototype.slice.call(document.querySelectorAll(selector)) : [ selector ])
 		.forEach(function(element) {
 			if(element instanceof HTMLElement) {
 				_.instances.forEach(function(parent) {
@@ -516,6 +544,7 @@
 				
 				((isObj(options.date) && instance.update()) || (element.value = ""));
 				
+				// Handle DOM events
 				instance.element
 				.on("click", function(e) {
 					instance[(instance.visible ? "hide" : "show")]();
@@ -667,11 +696,13 @@
 			}
 		}, this);
 		
+		// Use locale specified in constructor options if specified, otherwise browser locale. Default locale as fallback
 		this.locale = (options.locale || (navigator ? (navigator.userLanguage || navigator.language).replace("-", "_") : null));
+		
 		_.instances.push(this);
 	}
 	
-	_.VERSION = 0.13;
+	_.VERSION = 0.14;
 	_.instances = [];
 	
 	_.prototype = {
@@ -680,10 +711,10 @@
 				case "{date}":		return this._i18n.formatDate;
 				case "{datetime}":	return this._i18n.formatDateTime;
 			}
-			return (typeof this._fmt == "string" ? this._fmt : "");
+			return (isStr(this._fmt) ? this._fmt : "");
 		},
 		set format(value) {
-			this._fmt = (typeof value == "string" ? value : "");
+			this._fmt = (isStr(value) ? value : "");
 		},
 		get locale() {
 			return this._i18n;
@@ -704,6 +735,7 @@
 		}
 	};
 	
+	// Default locale settings
 	_.i18n = {
 		en_GB: {
 			anteMeridiem:	"㏂",
@@ -728,6 +760,7 @@
 		}
 	};
 	
+	// Enable dynamic resizing of Chronopic instances
 	if(typeof window != "undefined") {
 		window.addEventListener("resize", function(e) {
 			_.instances.forEach(function(instance) {
@@ -741,6 +774,7 @@
 	}
 	
 	if(typeof module == "object" && module.exports) {
+	//if(isObj(module) && module.exports) {
 		module.exports = _;
 	}
 	
