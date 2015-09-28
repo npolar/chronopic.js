@@ -57,3 +57,6 @@ Code            | Replaced with
 **{ap}**        | Day meridian (a.m. or p.m.)
 **{ww}**        | Week number (two digits)
 **{w}**         | Week number (one or two digits)
+
+### Locale settings:
+By default the browser locale is used if it has been properly loaded. Only the **en_GB** locale is included by default, but all available translations can be enabled by including the [chronopic-i18n.min.js](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n.min.js) file. To manually enable individual locale files, just include the corresponding file included in [dist/js/chronopic-i18n](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n), which also serves as a list of available languages.
