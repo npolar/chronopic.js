@@ -168,6 +168,7 @@
 			m = date.getMonth(),
 			y = date.getFullYear(),
 			h = date.getHours(),
+			h12 = (h % 12) || (locale.zeroHour ? 0 : 12),
 			n = date.getMinutes(),
 			s = date.getSeconds(),
 			w = δ(date).week,
@@ -191,8 +192,8 @@
 		.replace(/{YY}/g, y.toString().slice(-2))
 		.replace(/{HH}/g, ("0" + h).slice(-2))
 		.replace(/{H}/g, h)
-		.replace(/{hh}/g, ("0" + (h % 12)).slice(-2))
-		.replace(/{h}/g, h % 12)
+		.replace(/{hh}/g, ("0" + h12).slice(-2))
+		.replace(/{h}/g, h12)
 		.replace(/{mm}/g, ("0" + n).slice(-2))
 		.replace(/{m}/g, n)
 		.replace(/{ss}/g, ("0" + s).slice(-2))
@@ -702,7 +703,7 @@
 		_.instances.push(this);
 	}
 	
-	_.VERSION = 0.14;
+	_.VERSION = 0.15;
 	_.instances = [];
 	
 	_.prototype = {
