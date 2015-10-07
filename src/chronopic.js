@@ -552,67 +552,118 @@
 				})
 				.on("keydown", function(e) {
 					var key = e.keyCode,
-						beg = e.target.selectionStart,
-						val = e.target.value,
-						pos = 0, segs = [],
-						end, len, inc;
+						beg = e.target.selectionStart, end,
+						inc, tmp, leftmost, rightmost, genSegs;
 					
 					// 37:left, 38:up, 39:right, 40:down
 					if(key < 37 || key > 40) {
 						return;
 					}
 					
-					// FIXME: Add support for NO separators
-					self.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
-						len = seg.length;
+					// Split format string into segments of placeholders and separators
+					(genSegs = function(value) {
+						var segs = [], fmt, pos = 0;
 						
-						if(/^\{(.*)\}$/.test(seg)) {
+						self.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
+							// Translate formatted string if needed
+							fmt = /^\{(.*)\}$/.test(seg) ? ϝ(instance.date, seg, self._i18n) : seg;
+							
+							// Update end position of previous segment if present
+							((idx = segs.length) && (segs[idx - 1].end = pos));
+							
 							segs.push({
-								seg: seg,
-								beg: pos,
-								end: pos + (len = (++idx < arr.length ? val.slice(pos, val.indexOf(arr[idx], pos)).length : val.slice(pos).length))
+								fmt: seg,			// Format string
+								val: fmt,			// Output value
+								beg: pos,			// Start position
+								end: value.length,	// End position
+								field: (seg != fmt)	// Editable field?
 							});
-						}
+							
+							// Determine leftmost and rightmost editable fields
+							((seg != fmt) && (rightmost = segs[idx]) && (leftmost || (leftmost = rightmost)));
+							
+							pos += fmt.length;
+						});
 						
-						pos += len;
-					});
+						return segs;
+					})(e.target.value)
 					
-					segs.forEach(function(seg, idx, arr) {
-						if(!end && beg >= seg.beg && beg <= seg.end) {
-							if(e.target.selectionEnd == beg) {
+					// Loop through generated segments to determine keyboard action
+					.forEach(function(seg, idx, arr) {
+						if(beg < leftmost.beg) {
+							beg = leftmost.beg;
+							end = leftmost.end;
+						} else if(beg > rightmost.beg) {
+							beg = rightmost.beg;
+							end = rightmost.end;
+						} else if(!end && beg >= seg.beg && beg < seg.end) {
+							// Highlight editable segment if applicable
+							if(seg.field && e.target.selectionEnd == beg) {
 								beg = seg.beg;
 								end = seg.end;
-							} else if(key == 37) {	// Left
-								beg = (--idx >= 0 ? arr[idx].beg : seg.beg);
-								end = (idx >= 0 ? arr[idx].end : seg.end);
-							} else if(key == 39) {	// Right
-								beg = (++idx < arr.length ? arr[idx].beg : seg.beg);
-								end = (idx < arr.length ? arr[idx].end : seg.end);
-							} else if((inc = (key == 38)) || key == 40) {
-								beg = seg.beg;
-								end = seg.end;
-								seg = seg.seg;
-								inc = (inc ? 1 : -1);
-								
-								if(/D{1,2}/.test(seg)) {
-									instance.day += inc;
-								} else if(/M{1,4}/.test(seg)) {
-									instance.month += inc;
-								} else if(/YY(YY)?/.test(seg)) {
-									instance.year += inc;
-								} else if(/HH?/i.test(seg)) {
-									instance.hour += inc;
-								} else if(/mm?/.test(seg)) {
-									instance.minute += inc;
-								} else if(/ss?/.test(seg)) {
-									instance.second += inc;
-								} else if(/ap/.test(seg)) {
-									instance.hour += (12 * inc);
+							}
+							
+							// Change highlight to editable segment left of current
+							else if(key == 37) {
+								while(idx && !tmp) {
+									if((tmp = arr[--idx]).field) {
+										beg = tmp.beg;
+										end = tmp.end;
+									} else tmp = null;
+								}
+								(end || (end = leftmost.end));
+							}
+							
+							// Change highlight to editable segment right of current
+							else if(key == 39) { // right
+								while(++idx < arr.length && !tmp) {
+									if((tmp = arr[idx]).field) {
+										beg = tmp.beg;
+										end = tmp.end;
+									} else tmp = null;
+								}
+								(end || (end = rightmost.end));
+							}
+							
+							// Change value of highlighted segment
+							else if(key == 38 || key == 40) {
+								// Ensure highlighted segment is editable
+								if(seg.field) {
+									var fmt = seg.fmt, inc = (key == 38 ? 1 : -1);
+									
+									if(/D{1,2}/.test(fmt)) {
+										instance.day += inc;
+									} else if(/M{1,4}/.test(fmt)) {
+										instance.month += inc;
+									} else if(/YY(YY)?/.test(fmt)) {
+										instance.year += inc;
+									} else if(/HH?/i.test(fmt)) {
+										instance.hour += inc;
+									} else if(/mm?/.test(fmt)) {
+										instance.minute += inc;
+									} else if(/ss?/.test(fmt)) {
+										instance.second += inc;
+									} else if(/ap/.test(fmt)) {
+										instance.hour += (12 * inc);
+									}
+									
+									// Update GUI
+									instance.update();
+									(instance.visible && instance.show());
+									
+									// Update highlight area
+									tmp = genSegs(e.target.value)[idx];
+									beg = tmp.beg;
+									end = tmp.end;
 								}
 								
-								end += ϝ(instance.date, seg, self._i18n).length - val.slice(beg, end).length;
-								instance.update();
-								(instance.visible && instance.show());
+								// ...Otherwise, highlight editable segment to the left
+								else while(idx && !tmp) {
+									if((tmp = arr[--idx]).field) {
+										beg = tmp.beg;
+										end = tmp.end;
+									} else tmp = null;
+								}
 							}
 						}
 					});
@@ -703,7 +754,7 @@
 		_.instances.push(this);
 	}
 	
-	_.VERSION = 0.15;
+	_.VERSION = 0.20;
 	_.instances = [];
 	
 	_.prototype = {
