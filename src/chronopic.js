@@ -765,7 +765,7 @@
 		_.instances.push(this);
 	}
 	
-	_.VERSION = 0.20;
+	_.VERSION = 0.21;
 	_.instances = [];
 	
 	_.prototype = {
