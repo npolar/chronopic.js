@@ -430,15 +430,20 @@
 									var classNames = ".day",
 										monthDiff = col.getMonth() - instance.month,
 										disabled = !valid(col.getFullYear(), col.getMonth() + 1, col.getDate()),
+										title = ϝ(col, self.locale.titleDay, self.locale),
 										elem;
 										
 									((monthDiff == -1 || monthDiff == 11) && (classNames += ".prev"));
 									((monthDiff == 1 || monthDiff == -11) && (classNames += ".next"));
 									(sel.day && δ(sel.day).compare(col) >= 3 && (classNames += ".selected"));
-									(disabled && (classNames += ".disabled"));
 									(δ(col).compare(now) >= 3 && (classNames += ".now"));
 									
-									tr.add((elem = ε("td[title=" + ϝ(col, self.locale.titleDay, self.locale) + "]" + classNames, { html: col.getDate() })));
+									if(disabled) {
+										classNames += ".disabled";
+										title += " (" + self.locale.disabled + ")";
+									}
+									
+									tr.add((elem = ε("td[title=" + title + "]" + classNames, { html: col.getDate() })));
 									(!disabled && elem.on("click", function() {
 										instance.month = col.getMonth(),
 										instance.day = col.getDate();
@@ -483,13 +488,19 @@
 									var classNames = ".month",
 										month = col.getMonth(),
 										disabled = !valid(col.getFullYear(), month + 1),
+										title = ϝ(col, self.locale.titleMonth, self.locale),
 										elem;
 									
 									(sel.month && δ(sel.month).compare(col) >= 2 && (classNames += ".selected"));
 									(disabled && (classNames += ".disabled"));
 									(δ(col).compare(now) >= 2 && (classNames += ".now"));
 									
-									tr.add((elem = ε("td[colspan=2][title=" + self.locale.monthName[month] + "]" + classNames, { html: self.locale.monthNameShort[month] })));
+									if(disabled) {
+										classNames += ".disabled";
+										title += " (" + self.locale.disabled + ")";
+									}
+									
+									tr.add((elem = ε("td[colspan=2][title=" + title + "]" + classNames, { html: self.locale.monthNameShort[month] })));
 									(!disabled && elem.on("click", function() {
 										instance.date.setDate(1);
 										instance.month = month;
@@ -793,7 +804,7 @@
 			anteMeridiem:	"㏂",
 			dayOfWeek:		[ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
 			dayOfWeekShort:	[ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
-			disabled:		"Disabled",
+			disabled:		"disabled",
 			formatDate:		"{D} {MMMM} {YYYY}",
 			formatDateTime:	"{D} {MMMM} {YYYY}, {h}:{mm} {ap}",
 			month:			"Month",
