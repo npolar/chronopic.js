@@ -70,6 +70,6 @@ Code            | Replaced with
 **{w}**         | Week number (one or two digits)
 
 ### Locale settings:
-By default the browser locale is used if it has been properly loaded. Only the **en_GB** locale is included by default, but all available translations can be enabled by including the [chronopic-i18n.min.js](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n.min.js) file.
+By default, only the **en_GB** locale is included, but all available translations can be enabled by including the [chronopic-i18n.min.js](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n.min.js) file. Unless otherwise specified, the browser locale will be used if the translation exists, otherwise **en_GB** is used as a fallback.
 
 To manually enable individual locales, include the corresponding file located in [dist/js/chronopic-i18n/](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n).
