@@ -3,7 +3,7 @@
 		anteMeridiem:	"㏂",
 		dayOfWeek:		[ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
 		dayOfWeekShort:	[ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
-		disabled:		"Disabled",
+		disabled:		"disabled",
 		formatDate:		"{MMMM} {D}, {YYYY}",
 		formatDateTime:	"{MMMM} {D}, {YYYY} - {h}:{mm} {ap}",
 		month:			"Month",
