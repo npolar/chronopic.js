@@ -468,6 +468,7 @@
 											if(isNum((v = Number(e.target.value)))) {
 												instance.year = v;
 												instance.show("month");
+												instance.container.element.querySelector(".year input").focus();
 											}
 										})
 									),
@@ -765,7 +766,7 @@
 		_.instances.push(this);
 	}
 	
-	_.VERSION = 0.21;
+	_.VERSION = 0.22;
 	_.instances = [];
 	
 	_.prototype = {
@@ -837,7 +838,6 @@
 	}
 	
 	if(typeof module == "object" && module.exports) {
-	//if(isObj(module) && module.exports) {
 		module.exports = _;
 	}
 	
