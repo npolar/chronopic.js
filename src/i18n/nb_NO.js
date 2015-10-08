@@ -21,5 +21,5 @@
 		year:			"År"
 	};
 	
-	Chronopic.i18n.nb = Chronopic.i18n.nb_NO;
+	Chronopic.i18n.no = Chronopic.i18n.nb = Chronopic.i18n.nb_NO;
 })();
