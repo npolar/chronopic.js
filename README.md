@@ -2,7 +2,7 @@
 Date/Time/Datetime JavaScript Widget ([demo](http://npolar.github.io/chronopic.js/demo/)).
 
 ### Usage:
-Chronopic is added to HTML elements by creating a new instance of *Chronopic* using a CSS selector string as the first parameter, and optionally a map of options as the second parameter:
+Chronopic is added to HTML elements by creating a new instance of *Chronopic* using a CSS selector string as the first parameter, and optionally a map of settings as the second parameter:
 
 ```javascript
 // Invoke Chronopic with specified settings on input fields of class datepicker
@@ -15,11 +15,14 @@ new Chronopic('input.datepicker', {
     console.log(elem, date);
   }
 });
-
+```
+```javascript
 // Invoke Chronopic with locale settings if lang attribute is set
+new Chronopic('input[type="date"][lang="en"]', { locale: 'en_US' });
 new Chronopic('input[type="date"][lang="jp"]', { locale: 'ja_JP' });
 new Chronopic('input[type="date"][lang="no"]', { locale: 'nb_NO' });
-
+```
+```javascript
 // Invoke Chronopic on all datetime input fields using the material css extension
 new Chronopic('input[type="datetime"]', {
   className: '.chronopic.chronopic-ext-md',
@@ -67,6 +70,6 @@ Code            | Replaced with
 **{w}**         | Week number (one or two digits)
 
 ### Locale settings:
-By default the browser locale is used if it has been properly loaded. Only the **en_GB** locale is included by default, but all available translations can be enabled by including the [dist/js/chronopic-i18n.min.js](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n.min.js) file.
+By default the browser locale is used if it has been properly loaded. Only the **en_GB** locale is included by default, but all available translations can be enabled by including the [chronopic-i18n.min.js](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n.min.js) file.
 
-To manually enable individual locale files, just include the corresponding file included in [dist/js/chronopic-i18n/](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n).
+To manually enable individual locales, just include the corresponding file located in [dist/js/chronopic-i18n/](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n).
