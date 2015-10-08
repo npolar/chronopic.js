@@ -72,4 +72,4 @@ Code            | Replaced with
 ### Locale settings:
 By default the browser locale is used if it has been properly loaded. Only the **en_GB** locale is included by default, but all available translations can be enabled by including the [chronopic-i18n.min.js](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n.min.js) file.
 
-To manually enable individual locales, just include the corresponding file located in [dist/js/chronopic-i18n/](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n).
+To manually enable individual locales, include the corresponding file located in [dist/js/chronopic-i18n/](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n).
