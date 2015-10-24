@@ -15,7 +15,7 @@
         prevMonth:		"edellinen kuukausi",
         prevYear:		"edellinen vuosi",
         selectMonth:	"valitse kuukausi",
-        titleDay:		"{D} {DDDD} {MMMM} {YYYY}",
+        titleDay:		"{DDDD}, {D}. {MMMM}ta {YYYY}",
         titleMonth:		"{MMMM} {YYYY}",
         week:			"viikko",
         year:			"vuosi"
