@@ -23,6 +23,7 @@
 	</head>
 	<body>
 		<input type="datetime" lang="ja" placeholder="Japanese" />
+    	<input type="datetime" lang="fi" placeholder="Finnish" />
 		<input type="datetime" lang="nb" placeholder="Norwegian (Bokmål)" />
 		<input type="datetime" lang="nn" placeholder="Norwegian (Nynorsk)" />
 		<input type="datetime" lang="nl" placeholder="Dutch" />
@@ -38,6 +39,7 @@
 
 			new Chronopic('input[type="datetime"]', { date: new Date(), format: "{YYYY}-{MM}-{DD}" });
 			new Chronopic('input[type="datetime"][lang="ja"]', { locale: 'ja', format: "{datetime}" });
+        	new Chronopic('input[type="datetime"][lang="fi"]', { locale: 'fi' });
 			new Chronopic('input[type="datetime"][lang="nb"]', { locale: 'nb' });
 			new Chronopic('input[type="datetime"][lang="nn"]', { locale: 'nn' });
 			new Chronopic('input[type="datetime"][lang="nl"]', { locale: 'nl' });
