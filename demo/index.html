@@ -22,12 +22,13 @@
 		</style>
 	</head>
 	<body>
+		<input type="datetime" lang="en" placeholder="English (US)" />
+		<input type="datetime" lang="fi" placeholder="Finnish" />
 		<input type="datetime" lang="ja" placeholder="Japanese" />
-    	<input type="datetime" lang="fi" placeholder="Finnish" />
 		<input type="datetime" lang="nb" placeholder="Norwegian (Bokmål)" />
-		<input type="datetime" lang="nn" placeholder="Norwegian (Nynorsk)" />
 		<input type="datetime" lang="nl" placeholder="Dutch" />
-		<input type="datetime" lang="en" placeholder="US English" />
+		<input type="datetime" lang="nn" placeholder="Norwegian (Nynorsk)" />
+		
 		<input type="datetime" past placeholder="past only" />
 		<input type="datetime" future placeholder="future only" />
 		<input type="datetime" twentyfifteen placeholder="2015 only" />
@@ -38,12 +39,14 @@
 			var now = new Date();
 
 			new Chronopic('input[type="datetime"]', { date: new Date(), format: "{YYYY}-{MM}-{DD}" });
-			new Chronopic('input[type="datetime"][lang="ja"]', { locale: 'ja', format: "{datetime}" });
-        	new Chronopic('input[type="datetime"][lang="fi"]', { locale: 'fi' });
-			new Chronopic('input[type="datetime"][lang="nb"]', { locale: 'nb' });
-			new Chronopic('input[type="datetime"][lang="nn"]', { locale: 'nn' });
-			new Chronopic('input[type="datetime"][lang="nl"]', { locale: 'nl' });
+			
 			new Chronopic('input[type="datetime"][lang="en"]', { locale: 'en', format: "{datetime}" });
+			new Chronopic('input[type="datetime"][lang="fi"]', { locale: 'fi', format: "{datetime}"  });
+			new Chronopic('input[type="datetime"][lang="ja"]', { locale: 'ja', format: "{datetime}" });
+			new Chronopic('input[type="datetime"][lang="nb"]', { locale: 'nb', format: "{datetime}"  });
+			new Chronopic('input[type="datetime"][lang="nn"]', { locale: 'nn', format: "{datetime}"  });
+			new Chronopic('input[type="datetime"][lang="nl"]', { locale: 'nl', format: "{datetime}"  });
+			
 			new Chronopic('input[type="datetime"][past]', { max: now });
 			new Chronopic('input[type="datetime"][future]', { min: now });
 			new Chronopic('input[type="datetime"][twentyfifteen]', { min: { year: 2015 }, max: { year: 2015 } });
