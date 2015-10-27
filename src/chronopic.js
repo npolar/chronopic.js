@@ -244,6 +244,7 @@
 			locale: null,
 			max: { year: 2100 },
 			min: { year: 1900 },
+			monthYearOnly: false,
 			onChange: null
 		});
 		
@@ -252,6 +253,7 @@
 		this.instances = [];
 		this.max = (isObj(options.max) ? options.max : {});
 		this.min = (isObj(options.min) ? options.min : {});
+		this.monthYearOnly = (options.monthYearOnly === true ? true : false);
 		
 		// Private properties
 		this._i18n = _.i18n.en_GB;
@@ -505,7 +507,7 @@
 									(!disabled && elem.on("click", function() {
 										instance.date.setDate(1);
 										instance.month = month;
-										instance.show("day");
+										(self.monthYearOnly === true ? instance.update().hide() : instance.show("day"));
 									}));
 								});
 							});
@@ -521,7 +523,7 @@
 						this.date.setSeconds(value);
 					},
 					show: function(table) {
-						(table || (table = "day"));
+						table = (self.monthYearOnly === true ? "month" : (table || "day"));
 						this.rebuild(table);
 						this.visible = true;
 						
@@ -766,7 +768,7 @@
 		_.instances.push(this);
 	}
 	
-	_.VERSION = 0.22;
+	_.VERSION = 0.30;
 	_.instances = [];
 	
 	_.prototype = {
