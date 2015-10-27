@@ -52,7 +52,7 @@
 {
   background-color: rgb(238,238,238);
   border-right: 1px solid rgb(224, 224, 224);
-  color: rgba(0,0,0,0.54);
+  color: rgba(0,0,0,0.54) !important;
 }
 
 .chronopic-ext-md td.month
