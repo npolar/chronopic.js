@@ -67,7 +67,7 @@
 
 .chronopic-ext-md thead .title th:not(.disabled):not(.selected):not(.year):hover
 {
-  background-color: rgb(16,108,200);
+  background-color: rgb(16,108,200) !important;
   color: #fff;
 }
 
