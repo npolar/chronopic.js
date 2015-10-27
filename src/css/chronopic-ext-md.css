@@ -36,7 +36,7 @@
 
 .chronopic-ext-md td.selected
 {
-  background-color: rgb(16,108,200);
+  background-color: rgb(16,108,200) !important;
   color: #fff;
   border-radius: 200px;
 }
