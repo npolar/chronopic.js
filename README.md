@@ -32,16 +32,16 @@ new Chronopic('input[type="datetime"]', {
 ```
 
 ### Constructor options:
-Key               | Value                                                        | Default
-------------------|--------------------------------------------------------------|--------------
-**className**     | Dot-separated CSS class names added to container             | *.chronopic*
-**date**          | Pre-selected date object (or *null*)                         | *null*
-**format**        | Output format as a string (see format values below)          | *{date}*
-**locale**        | Name of locale or *null* for browser locale                  | *null*
-**max**           | Date or object describing the maximum date                   | *{ year: 2100 }*
-**min**           | Date or object describing the minimum date                   | *{ year: 1900 }*
-**monthYearOnly** | Disable day selection table (only show month and year)       | *false*
-**onChange**      | *function(HTMLInputElement, Date)* called when value changes | *null*
+Key               | Value                                                     | Default
+------------------|-----------------------------------------------------------|--------------
+**className**     | Dot-separated CSS class names added to container          | *.chronopic*
+**date**          | Pre-selected date object (or *null*)                      | *null*
+**format**        | Output format as a string (see format values below)       | *{date}*
+**locale**        | Name of locale or *null* for browser locale               | *null*
+**max**           | Date or object describing the maximum date                | *{ year: 2100 }*
+**min**           | Date or object describing the minimum date                | *{ year: 1900 }*
+**monthYearOnly** | Disable day selection table (only show month and year)    | *false*
+**onChange**      | *function(HTMLInputElement, Date)* called on value change | *null*
 
 ### Format values:
 Code            | Replaced with
