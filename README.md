@@ -1,7 +1,7 @@
 # chronopic.js
 Date/Time/Datetime JavaScript Widget ([demo](http://npolar.github.io/chronopic.js/demo/)).
 
-### Usage:
+## Usage:
 Chronopic is added to HTML elements by creating a new instance of *Chronopic* using a CSS selector string as the first parameter, and optionally a map of settings as the second parameter:
 
 ```javascript
@@ -31,7 +31,7 @@ new Chronopic('input[type="datetime"]', {
 
 ```
 
-### Constructor options:
+#### Constructor options:
 Key               | Value                                                     | Default
 ------------------|-----------------------------------------------------------|--------------
 **className**     | Dot-separated CSS class names added to container          | *.chronopic*
@@ -43,7 +43,7 @@ Key               | Value                                                     | 
 **monthYearOnly** | Disable day selection table (only show month and year)    | *false*
 **onChange**      | *function(HTMLInputElement, Date)* called on value change | *null*
 
-### Format values:
+#### Format values:
 Code            | Replaced with
 ----------------|--------------
 **{date}**      | Locale specific date format (date, month, year)
@@ -70,7 +70,31 @@ Code            | Replaced with
 **{ww}**        | Week number (two digits)
 **{w}**         | Week number (one or two digits)
 
-### Locale settings:
+#### Locale settings:
 By default, only the **en_GB** locale is included, but all available translations can be enabled by including the [chronopic-i18n.min.js](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n.min.js) file. Unless otherwise specified, the browser locale will be used if the translation exists, otherwise **en_GB** is used as a fallback.
 
 To manually enable individual locales, include the corresponding file located in [dist/js/chronopic-i18n/](https://github.com/npolar/chronopic.js/tree/master/dist/js/chronopic-i18n).
+
+## Contribution:
+Contributing to the project is encouraged, and any help is appreciated. Even if you are not familiar with JavaScript, you can still contribute to the project by adding translations, or stylesheet extensions for aesthetical improvements. If you experience any bugs or have any suggestions for improvements, feel free to file an [issue](https://github.com/npolar/chronopic.js/issues).
+
+#### Prerequisites:
+First, install [git](https://git-scm.com/) and [node](https://nodejs.org)/[npm](https://npmjs.com) so you can download the required source files and dependencies. Afterwards, run the following commands to clone the repository, and automatically install the required developer dependencies:
+
+```sh
+git clone https://github.com/npolar/chronopic.js.git
+cd chronopic.js && npm install
+```
+
+#### Language contributions:
+After cloning the project, you can add new translations to the [src/i18n](https://github.com/npolar/chronopic.js/tree/master/src/i18n) directory, using one of the existing files in the same directory as a template. Please keep the same file name format as used by other translations. The JavaScript object containing all translations should be named using the full **language**_**TERRITORY** format (e.g. en_US). Abbreviations, if existent and standardised, can be added to the bottom of the file, such as:
+
+> Chronopic.i18n.**en** = Chronopic.i18n.**en_US**;
+
+For languages representing time in *24-hour* format, just keep the **anteMeridiem** and **postMeridiem** properties as **empty strings**, whilst for languages using *12-hour* format, please add the appropriate values.
+
+After adding translation source files to the **src/i18n** directory, do **not** try to manually generate the distributed versions (i.e. files located in the **dist/** directory). These files are generated automatically by running the following command:
+
+```sh
+gulp
+```
