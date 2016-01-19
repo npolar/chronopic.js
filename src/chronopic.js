@@ -1,45 +1,45 @@
 (function() {
 	"use strict";
-	
+
 	// Function used to check if a variable is a valid number
 	function isNum(value) {
 		return (typeof value == "number" && !isNaN(value) && Math.abs(value) < Infinity);
 	}
-	
+
 	// Function used to check if a variable is a valid object
 	function isObj(value) {
 		return (typeof value == "object" && value);
 	}
-	
+
 	// Function used to check if a variable is a valid string
 	function isStr(value) {
 		return (typeof value == "string" && value);
 	}
-	
+
 	// Function used to parse a map of option variables and set default values
 	function parseOptions(options, defaults) {
 		(isObj(options) || (options = {}));
-		
+
 		for(var d in defaults) {
 			(options.hasOwnProperty(d) || (options[d] = defaults[d]));
 		}
-		
+
 		return options;
 	}
-	
+
 	// DOM Element helper class for easy DOM manipulation
 	function Element(selector, options) {
 		options = parseOptions(options, {
-			appendTo: null,
-			context: document,
-			html: "",
-			insertAfter: null,
-			insertBefore: null,
-			replace: null
+			appendTo:      null,
+			context:       document,
+			html:          "",
+			insertAfter:   null,
+			insertBefore:  null,
+			replace:       null
 		});
-		
+
 		var a, parsed, elem = (selector instanceof HTMLElement ? selector : null);
-		
+
 		if(isStr(selector)) {
 			parsed = (function(selector, parsed) {
 				selector.match(/(\[[^\]]+\]|#[^#.\[]+|\.[^#.\[]+|\w+)/g)
@@ -51,47 +51,47 @@
 				});
 				return parsed;
 			})(selector, { attribs: {}, classes: [] });
-			
+
 			// Create element from parsed string
 			elem = options.context.createElement(parsed.tag);
-			
+
 			// Add classes
 			parsed.classes.forEach(function(className) {
 				elem.classList.add(className);
 			});
-			
+
 			// Add attributes
 			for(a in parsed.attribs) {
 				(parsed.attribs.hasOwnProperty(a) && elem.setAttribute(a, parsed.attribs[a]));
 			}
 		}
-		
+
 		(this.element = elem).innerHTML = options.html;
 		this.parent = null;
 		this.events = {};
-		
+
 		// Add element to DOM
 		if(options.replace) {
 			options.replace.parentNode.replaceChild(elem, options.replace);
 		} else if(options.appendTo) {
 			(this.parent = options.appendTo).element.appendChild(elem);
 		} else if(options.insertAfter) {
-			options.insertAfter.parentNode.insertBefore(elem, options.insertAfter.nextSibling);			
+			options.insertAfter.parentNode.insertBefore(elem, options.insertAfter.nextSibling);
 		} else if(options.insertBefore) {
 			options.insertBefore.parentNode.insertBefore(elem, options.insertBefore);
 		}
 	}
-	
+
 	Element.prototype = {
 		add: function(elements, clear) {
 			(clear === true && (this.clear()));
-			
+
 			(elements instanceof Array ? elements : [ elements ])
 			.forEach(function(element) {
 				this.element.appendChild(element.element);
 				element.parent = this;
 			}, this);
-			
+
 			return this;
 		},
 		get classes() {
@@ -99,11 +99,11 @@
 		},
 		clear: function() {
 			var elem = this.element, child;
-			
+
 			while((child = elem.firstChild)) {
 				elem.removeChild(child);
 			}
-			
+
 			return this;
 		},
 		on: function(events, callback) {
@@ -111,7 +111,7 @@
 			.forEach(function(event) {
 				var self = this, fn = (typeof callback == "function" ? function(e) { return callback.call(self, e); } : null);
 				(self.events[event] instanceof Array || (self.events[event] = []));
-				
+
 				if(fn) {
 					self.events[event].push(fn);
 					self.element.addEventListener(event, fn);
@@ -123,20 +123,20 @@
 			return this;
 		}
 	};
-	
+
 	// JavaScript Date object wrapper for additional functionality
 	function δ(date) {
 		return {
 			// Function used to compare date objects and return a number between 0 (unequal) and 6 (equal to the second)
 			compare: function(arg) {
 				var result = 0, f, fragments = [ "getFullYear", "getMonth", "getDate", "getHours", "getMinutes", "getSeconds" ];
-				
+
 				for(f in fragments) {
 					if(date[fragments[f]]() == arg[fragments[f]]()) {
 						result = ++f;
 					} else break;
 				}
-				
+
 				return result;
 			},
 			// Number of days in current month
@@ -156,25 +156,25 @@
 			}
 		};
 	}
-	
+
 	// Alias to create a new Element instance
 	function ε(selector, options) {
 		return new Element(selector, options);
 	}
-	
+
 	// Function used to parse a formatted string based on specified locale
 	function ϝ(date, format, locale) {
 		var d = date.getDate(),
-			m = date.getMonth(),
-			y = date.getFullYear(),
-			h = date.getHours(),
-			h12 = (h % 12) || (locale.zeroHour ? 0 : 12),
-			n = date.getMinutes(),
-			s = date.getSeconds(),
-			w = δ(date).week,
-			wd = date.getDay(),
-			ap = h < 12 ? locale.anteMeridiem : locale.postMeridiem;
-			
+		    m = date.getMonth(),
+		    y = date.getFullYear(),
+		    h = date.getHours(),
+		    h12 = (h % 12) || (locale.zeroHour ? 0 : 12),
+		    n = date.getMinutes(),
+		    s = date.getSeconds(),
+		    w = δ(date).week,
+		    wd = date.getDay(),
+		    ap = h < 12 ? locale.anteMeridiem : locale.postMeridiem;
+
 		return format
 		.replace(/{date}/gi, locale.formatDate)
 		.replace(/{datetime}/gi, locale.formatDateTime)
@@ -200,96 +200,96 @@
 		.replace(/{s}/g, s)
 		.replace(/{ap}/g, ap);
 	}
-	
+
 	// Function used to create a table of days based on specified year and month
 	function dayTable(year, month) {
 		var firstDay = δ(new Date(year, month)).firstDay || 7,
-			current = new Date(year, month, 1 - ((firstDay - 1) || 7)),
-			row, col, table = [];
-			
+		    current = new Date(year, month, 1 - ((firstDay - 1) || 7)),
+		    row, col, table = [];
+
 		for(row = 0; row < 6; ++row) {
 			table.push([]);
-			
+
 			for(col = 0; col < 7; ++col) {
-				table[row].push(new Date(current)); 
+				table[row].push(new Date(current));
 				current.setDate(current.getDate() + 1);
 			}
 		}
-		
+
 		return table;
 	}
-	
+
 	// Function used to create a table of months based on specified year
 	function monthTable(year) {
 		var row, col, table = [];
-		
+
 		for(row = 0; row < 3; ++row) {
 			table.push([]);
-			
+
 			for(col = 0; col < 4; ++col) {
 				table[row].push(new Date(year, (row * 4) + col));
 			}
 		}
-		
+
 		return table;
 	}
-	
+
 	// Chronopic main class
 	function _(selector, options) {
 		// Constructor options and defaults
 		options = parseOptions(options, {
-			className: "chronopic",
-			date: null,
-			format: "{date}",
-			locale: null,
-			max: { year: 2100 },
-			min: { year: 1900 },
-			monthYearOnly: false,
-			onChange: null
+			className:      "chronopic",
+			date:           null,
+			format:         "{date}",
+			locale:         null,
+			max:            { year: 2100 },
+			min:            { year: 1900 },
+			monthYearOnly:  false,
+			onChange:       null
 		});
-		
+
 		// Public properties
 		this.format = options.format;
 		this.instances = [];
 		this.max = (isObj(options.max) ? options.max : {});
 		this.min = (isObj(options.min) ? options.min : {});
 		this.monthYearOnly = (options.monthYearOnly === true ? true : false);
-		
+
 		// Private properties
 		this._i18n = _.i18n.en_GB;
-		
+
 		var self = this, date = new Date();
 		(isObj(options.date) && (date = ((date = options.date) instanceof Date ? new Date(date) : new Date(date.year, date.month - 1, date.day))));
-		
+
 		// Parse minimum and maximum dates from options
 		(self.max instanceof Date && (self.max = { year: self.max.getFullYear(), month: self.max.getMonth() + 1, day: self.max.getDate() }));
 		(self.min instanceof Date && (self.min = { year: self.min.getFullYear(), month: self.min.getMonth() + 1, day: self.min.getDate() }));
-		
+
 		// Function used to check if a specified date is within a valid range
 		function valid(year, month, day) {
 			var days, min = self.min, max = self.max, fixed;
-			
+
 			while(day > (days = δ(new Date(year, month, day)).days)) { ++month; day -= day - days; }
 			while(month > 12) { ++year; month -= 12; }
-			
+
 			if(!isNaN((fixed = new Date(year, month - 1, isNaN(day) ? 1 : day)))) {
 				year = fixed.getFullYear();
 				month = fixed.getMonth() + 1;
 				day = fixed.getDate();
 			}
-			
+
 			if(isNum(year)) {
 				if((isNum(min.year) && year < min.year)
 				|| (isNum(max.year) && year > max.year)) {
 					return false;
 				}
-				
+
 				if(isNum(month)) {
 					if((isNum(min.month) && month < min.month && year <= min.year)
 					|| (isNum(max.month) && month > max.month && year >= max.year)) {
 						return false;
 					}
-					
+
 					if(isNum(day)) {
 						if((isNum(min.day) && day < min.day && month <= min.month && year <= min.year)
 						|| (isNum(max.day) && day > max.day && month >= max.month && year >= max.year)) {
@@ -298,10 +298,10 @@
 					}
 				}
 			}
-				
+
 			return true;
 		}
-		
+
 		// Inject Chronpic in DOM Elements from constructor selector parameter
 		(isStr(selector) ? Array.prototype.slice.call(document.querySelectorAll(selector)) : [ selector ])
 		.forEach(function(element) {
@@ -315,22 +315,22 @@
 						}
 					});
 				});
-				
+
 				var sibling = element.nextSibling;
 				((sibling.tagName == "DIV" && sibling.classList.contains(options.className)) || (sibling = null));
-				
+
 				var className = options.className,
-					container = ε("div." + className, { insertAfter: element, replace: sibling }),
-					instance,
-					self = this,
-					tables = {};
-					
+				    container = ε("div." + className, { insertAfter: element, replace: sibling }),
+				    instance,
+				    self = this,
+				    tables = {};
+
 				[ "day", "month" ].forEach(function(table) {
 					container.add((tables[table] = ε("table.hidden." + table)));
 					tables[table].head = ε("thead", { appendTo: tables[table] });
 					tables[table].body = ε("tbody", { appendTo: tables[table] });
 				});
-				
+
 				self.instances.push((instance = {
 					date: new Date(date),
 					container: container,
@@ -339,7 +339,7 @@
 					tables: tables,
 					value: "",
 					visible: false,
-					
+
 					get day() {
 						return this.date.getDate();
 					},
@@ -353,15 +353,15 @@
 						for(var t in tables) {
 							tables[t].classes.add("hidden");
 						}
-						
+
 						this.visible = false;
 						this.selected.month = null;
-						
+
 						if(this.selected.day) {
 							this.date = new Date(this.selected.day);
 							this.selected.month = new Date(this.date);
 						}
-						
+
 						return this;
 					},
 					get hour() {
@@ -389,11 +389,11 @@
 					},
 					rebuild: function(table) {
 						var instance = this,
-							sel = instance.selected,
-							now = new Date(),
-							dow = 1,
-							lables, i;
-							
+						    sel = instance.selected,
+						    now = new Date(),
+						    dow = 1,
+						    lables, i;
+
 						if(!table || table == "day") {
 							instance.tables.day.head.add([
 								ε("tr.title").add([
@@ -418,33 +418,33 @@
 								]),
 								(lables = ε("tr.labels").add(ε("th.week", { html: self.locale.week })))
 							], true);
-							
+
 							for(i = 0; i < 7; ++i) {
 								lables.add(ε("th.day[title=" + self.locale.dayOfWeek[dow % 7] + "]", { html: self.locale.dayOfWeekShort[dow++ % 7] }));
 							}
-							
+
 							instance.tables.day.body.clear();
 							dayTable(instance.year, instance.month).forEach(function(row) {
 								var tr = ε("tr", { appendTo: instance.tables.day.body });
 								tr.add(ε("td.week", { html: δ(row[0]).week }));
-								
+
 								row.forEach(function(col) {
 									var classNames = ".day",
 										monthDiff = col.getMonth() - instance.month,
 										disabled = !valid(col.getFullYear(), col.getMonth() + 1, col.getDate()),
 										title = ϝ(col, self.locale.titleDay, self.locale),
 										elem;
-										
+
 									((monthDiff == -1 || monthDiff == 11) && (classNames += ".prev"));
 									((monthDiff == 1 || monthDiff == -11) && (classNames += ".next"));
 									(sel.day && δ(sel.day).compare(col) >= 3 && (classNames += ".selected"));
 									(δ(col).compare(now) >= 3 && (classNames += ".now"));
-									
+
 									if(disabled) {
 										classNames += ".disabled";
 										title += " (" + self.locale.disabled + ")";
 									}
-									
+
 									tr.add((elem = ε("td[title=" + title + "]" + classNames, { html: col.getDate() })));
 									(!disabled && elem.on("click", function() {
 										instance.month = col.getMonth(),
@@ -454,7 +454,7 @@
 								});
 							});
 						}
-						
+
 						if(!table || table == "month") {
 							instance.tables.month.head.add([
 								ε("tr.title").add([
@@ -482,27 +482,27 @@
 									})
 								]),
 							], true);
-							
+
 							instance.tables.month.body.clear();
 							monthTable(instance.year).forEach(function(row) {
 								var tr = ε("tr", { appendTo: instance.tables.month.body });
-								
+
 								row.forEach(function(col) {
 									var classNames = ".month",
-										month = col.getMonth(),
-										disabled = !valid(col.getFullYear(), month + 1),
-										title = ϝ(col, self.locale.titleMonth, self.locale),
-										elem;
-									
+									    month = col.getMonth(),
+									    disabled = !valid(col.getFullYear(), month + 1),
+									    title = ϝ(col, self.locale.titleMonth, self.locale),
+									    elem;
+
 									(sel.month && δ(sel.month).compare(col) >= 2 && (classNames += ".selected"));
 									(disabled && (classNames += ".disabled"));
 									(δ(col).compare(now) >= 2 && (classNames += ".now"));
-									
+
 									if(disabled) {
 										classNames += ".disabled";
 										title += " (" + self.locale.disabled + ")";
 									}
-									
+
 									tr.add((elem = ε("td[colspan=2][title=" + title + "]" + classNames, { html: self.locale.monthNameShort[month] })));
 									(!disabled && elem.on("click", function() {
 										instance.date.setDate(1);
@@ -512,7 +512,7 @@
 								});
 							});
 						}
-						
+
 						return this;
 					},
 					get second() {
@@ -526,15 +526,15 @@
 						table = (self.monthYearOnly === true ? "month" : (table || "day"));
 						this.rebuild(table);
 						this.visible = true;
-						
+
 						for(var t in tables) {
 							(tables.hasOwnProperty(t) && tables[t].classes[(t == table ? "remove" : "add")]("hidden"));
 						}
-						
+
 						var container = this.container.element, elem = element;
 						container.style.top = elem.offsetTop + elem.offsetHeight + "px";
 						container.style.left = elem.offsetLeft + "px";
-						
+
 						if(container.offsetWidth != elem.offsetWidth) {
 							container.style.width = elem.offsetWidth + "px";
 						}
@@ -542,11 +542,11 @@
 					update: function() {
 						this.value = element.value = ϝ(this.date, self.format, self._i18n);
 						this.selected.day = new Date(this.date);
-						
+
 						if(typeof options.onChange == 'function') {
 							options.onChange(element, this.date);
 						}
-						
+
 						return this;
 					},
 					get year() {
@@ -556,9 +556,9 @@
 						(valid(value) && this.date.setFullYear(value));
 					}
 				}));
-				
+
 				((isObj(options.date) && instance.update()) || (element.value = ""));
-				
+
 				// Handle DOM events
 				instance.element
 				.on("click", function(e) {
@@ -566,42 +566,42 @@
 				})
 				.on("keydown", function(e) {
 					var key = e.keyCode,
-						beg = e.target.selectionStart, end,
-						inc, tmp, leftmost, rightmost, genSegs;
-					
+					    beg = e.target.selectionStart, end,
+					    inc, tmp, leftmost, rightmost, genSegs;
+
 					// 37:left, 38:up, 39:right, 40:down
 					if(key < 37 || key > 40) {
 						return;
 					}
-					
+
 					// Split format string into segments of placeholders and separators
 					(genSegs = function(value) {
 						var segs = [], fmt, pos = 0;
-						
+
 						self.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
 							// Translate formatted string if needed
 							fmt = /^\{(.*)\}$/.test(seg) ? ϝ(instance.date, seg, self._i18n) : seg;
-							
+
 							// Update end position of previous segment if present
 							((idx = segs.length) && (segs[idx - 1].end = pos));
-							
+
 							segs.push({
-								fmt: seg,			// Format string
-								val: fmt,			// Output value
-								beg: pos,			// Start position
-								end: value.length,	// End position
-								field: (seg != fmt)	// Editable field?
+								fmt:    seg,            // Format string
+								val:    fmt,            // Output value
+								beg:    pos,            // Start position
+								end:    value.length,   // End position
+								field:  (seg != fmt)    // Editable field?
 							});
-							
+
 							// Determine leftmost and rightmost editable fields
 							((seg != fmt) && (rightmost = segs[idx]) && (leftmost || (leftmost = rightmost)));
-							
+
 							pos += fmt.length;
 						});
-						
+
 						return segs;
 					})(e.target.value)
-					
+
 					// Loop through generated segments to determine keyboard action
 					.forEach(function(seg, idx, arr) {
 						if(beg < leftmost.beg) {
@@ -616,7 +616,7 @@
 								beg = seg.beg;
 								end = seg.end;
 							}
-							
+
 							// Change highlight to editable segment left of current
 							else if(key == 37) {
 								while(idx && !tmp) {
@@ -627,7 +627,7 @@
 								}
 								(end || (end = leftmost.end));
 							}
-							
+
 							// Change highlight to editable segment right of current
 							else if(key == 39) { // right
 								while(++idx < arr.length && !tmp) {
@@ -638,13 +638,13 @@
 								}
 								(end || (end = rightmost.end));
 							}
-							
+
 							// Change value of highlighted segment
 							else if(key == 38 || key == 40) {
 								// Ensure highlighted segment is editable
 								if(seg.field) {
 									var fmt = seg.fmt, inc = (key == 38 ? 1 : -1);
-									
+
 									if(/D{1,2}/.test(fmt)) {
 										instance.day += inc;
 									} else if(/M{1,4}/.test(fmt)) {
@@ -660,17 +660,17 @@
 									} else if(/ap/.test(fmt)) {
 										instance.hour += (12 * inc);
 									}
-									
+
 									// Update GUI
 									instance.update();
 									(instance.visible && instance.show());
-									
+
 									// Update highlight area
 									tmp = genSegs(e.target.value)[idx];
 									beg = tmp.beg;
 									end = tmp.end;
 								}
-								
+
 								// ...Otherwise, highlight editable segment to the left
 								else while(idx && !tmp) {
 									if((tmp = arr[--idx]).field) {
@@ -681,17 +681,17 @@
 							}
 						}
 					});
-					
+
 					e.preventDefault();
 					e.target.selectionStart = beg;
 					e.target.selectionEnd = end || beg;
 				})
 				.on("change", function(e) {
 					var newVal = e.target.value,
-						valPos = 0,
-						status = true,
-						d, m, y, h, n, s, a;
-						
+					    valPos = 0,
+					    status = true,
+					    d, m, y, h, n, s, a;
+
 					self.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
 						if(status) {
 							if(/^\{(.*)\}$/.test(seg)) {
@@ -699,7 +699,7 @@
 								(++idx < arr.length && (val = val.slice(0, val.search(arr[idx]))));
 								valPos += val.length;
 								seg = seg.slice(1, -1);
-								
+
 								if(seg == "DD" || seg == "D") {
 									d = Number(val);
 								} else if(seg == "MMMM") {
@@ -734,23 +734,23 @@
 							}
 						}
 					});
-					
+
 					if(!status) {
 						e.target.value = instance.value;
 						return;
 					}
-					
+
 					(isNum(s) && (instance.second = s));
 					(isNum(n) && (instance.minute = n));
 					(isNum(h) && (instance.hour = h));
 					(isNum(d) && (instance.day = d));
 					(isNum(m) && (instance.month = m - 1));
 					(isNum(y) && (instance.year = y));
-					
+
 					instance.update();
 					(instance.visible && instance.show());
 				});
-				
+
 				document.addEventListener("click", function(e, node) {
 					while((node = node ? node.parentNode : e.target)) {
 						if(node == element || node == container.element) {
@@ -761,21 +761,21 @@
 				});
 			}
 		}, this);
-		
+
 		// Use locale specified in constructor options if specified, otherwise browser locale. Default locale as fallback
 		this.locale = (options.locale || (navigator ? (navigator.userLanguage || navigator.language).replace("-", "_") : null));
-		
+
 		_.instances.push(this);
 	}
-	
+
 	_.VERSION = 0.30;
 	_.instances = [];
-	
+
 	_.prototype = {
 		get format() {
 			switch(this._fmt) {
-				case "{date}":		return this._i18n.formatDate;
-				case "{datetime}":	return this._i18n.formatDateTime;
+				case "{date}":     return this._i18n.formatDate;
+				case "{datetime}": return this._i18n.formatDateTime;
 			}
 			return (isStr(this._fmt) ? this._fmt : "");
 		},
@@ -788,44 +788,44 @@
 		set locale(value) {
 			if(_.i18n[value] && (_.i18n[value] !== this._i18n)) {
 				this._i18n = _.i18n[value];
-				
+
 				this.instances.forEach(function(instance) {
 					if(instance.selected.day) {
 						instance.day = instance.date.getDate();
 						instance.update()
 					}
-					
+
 					instance.rebuild();
 				});
 			}
 		}
 	};
-	
+
 	// Default locale settings
 	_.i18n = {
 		en_GB: {
-			anteMeridiem:	"㏂",
-			dayOfWeek:		[ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
-			dayOfWeekShort:	[ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
-			disabled:		"disabled",
-			formatDate:		"{D} {MMMM} {YYYY}",
-			formatDateTime:	"{D} {MMMM} {YYYY}, {h}:{mm} {ap}",
-			month:			"Month",
-			monthName:		[ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
-			monthNameShort:	[ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
-			nextMonth:		"Next month",
-			nextYear:		"Next year",
-			postMeridiem:	"㏘",
-			prevMonth:		"Previous month",
-			prevYear:		"Previous year",
-			selectMonth:	"Select month",
-			titleDay:		"{DDDD} {D} {MMMM} {YYYY}",
-			titleMonth:		"{MMMM} {YYYY}",
-			week:			"Week",
-			year:			"Year"
+			anteMeridiem:   "㏂",
+			dayOfWeek:      [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
+			dayOfWeekShort: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
+			disabled:       "disabled",
+			formatDate:     "{D} {MMMM} {YYYY}",
+			formatDateTime: "{D} {MMMM} {YYYY}, {h}:{mm} {ap}",
+			month:          "Month",
+			monthName:      [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
+			monthNameShort: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
+			nextMonth:      "Next month",
+			nextYear:       "Next year",
+			postMeridiem:   "㏘",
+			prevMonth:      "Previous month",
+			prevYear:       "Previous year",
+			selectMonth:    "Select month",
+			titleDay:       "{DDDD} {D} {MMMM} {YYYY}",
+			titleMonth:     "{MMMM} {YYYY}",
+			week:           "Week",
+			year:           "Year"
 		}
 	};
-	
+
 	// Enable dynamic resizing of Chronopic instances
 	if(typeof window != "undefined") {
 		window.addEventListener("resize", function(e) {
@@ -835,13 +835,13 @@
 				});
 			});
 		});
-		
+
 		window.Chronopic = _;
 	}
-	
+
 	if(typeof module == "object" && module.exports) {
 		module.exports = _;
 	}
-	
+
 	return _;
 })();
