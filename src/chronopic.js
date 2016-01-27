@@ -233,6 +233,7 @@
 		options = Object.assign({
 			className:      "chronopic",
 			date:           null,
+			direction:      "down",
 			format:         "{date}",
 			locale:         null,
 			max:            { year: 2100 },
@@ -242,6 +243,7 @@
 		}, options);
 
 		// Public properties
+		this.direction      = options.direction;
 		this.format         = options.format;
 		this.instances      = [];
 		this.max            = ("object" == typeof options.max ? options.max : {});
@@ -534,17 +536,31 @@
 						this.rebuild(table);
 						this.visible = true;
 
-						for(var t in tables) {
+						var container = { elem: this.container.element, h: 0, w: 0 }, t,
+						    parent = { h: container.elem.parentNode.offsetHeight, w: container.elem.parentNode.offsetWidth },
+						    elem = { h: element.offsetHeight, w: element.offsetWidth, x: element.offsetLeft, y: element.offsetTop };
+
+						for(t in tables) {
 							(tables.hasOwnProperty(t) && tables[t].classes[(t == table ? "remove" : "add")]("hidden"));
+							container.h = Math.max(container.h, tables[t].element.offsetHeight);
+							container.w = Math.max(container.w, tables[t].element.offsetWidth);
 						}
 
-						var container = this.container.element, elem = element;
-						container.style.top = elem.offsetTop + elem.offsetHeight + "px";
-						container.style.left = elem.offsetLeft + "px";
+						var upPos = (elem.y - container.h) + "px",
+						    downPos = (elem.y + elem.h) + "px",
+						    centerPos = ((parent.h / 2) - (container.h / 2)) + "px",
+							fitsDown = ((elem.y + elem.h + container.h) < parent.h),
+						    fitsUp = (elem.y - container.h > 0),
+							dir = self.direction;
 
-						if(container.offsetWidth != elem.offsetWidth) {
-							container.style.width = elem.offsetWidth + "px";
-						}
+						container.elem.style.top =
+							(dir == "down" ? downPos :
+								(dir == "up" ? upPos :
+									(fitsDown ? downPos :
+										(fitsUp ? upPos :
+											centerPos))));
+
+						(container.w == elem.w || (container.elem.style.width = elem.w + "px"));
 					},
 					update: function() {
 						this.value = element.value = formatted(this.date, self.format, self._i18n);
@@ -775,10 +791,17 @@
 		_.instances.push(this);
 	}
 
-	_.VERSION = 0.32;
+	_.VERSION = 0.40;
 	_.instances = [];
 
 	_.prototype = {
+		get direction() {
+			return (this._dir || "auto");
+		},
+		set direction(value) {
+			([ "auto", "down", "up" ].indexOf(value.toLowerCase()) != -1 && (this._dir = value.toLowerCase()));
+			return this.direction;
+		},
 		get format() {
 			switch(this._fmt) {
 			case "{date}":
