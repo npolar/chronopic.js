@@ -6,16 +6,6 @@
 		return (typeof value == "number" && !isNaN(value) && Math.abs(value) < Infinity);
 	}
 
-	// Function used to check if a variable is a valid object
-	function isObj(value) {
-		return (typeof value == "object" && value);
-	}
-
-	// Function used to check if a variable is a valid string
-	function isStr(value) {
-		return (typeof value == "string" && value);
-	}
-
 	// Object.assign polyfill
 	("function" != typeof Object.assign && (Object.assign = function(target) {
 		if(undefined === target || null === target) {
@@ -48,7 +38,7 @@
 
 		var a, parsed, elem = (selector instanceof HTMLElement ? selector : null);
 
-		if(isStr(selector)) {
+		if("string" == typeof selector) {
 			parsed = (function(selector, parsed) {
 				selector.match(/(\[[^\]]+\]|#[^#.\[]+|\.[^#.\[]+|\w+)/g)
 				.forEach(function(m) {
@@ -165,13 +155,8 @@
 		};
 	}
 
-	// Alias to create a new Element instance
-	function ε(selector, options) {
-		return new Element(selector, options);
-	}
-
 	// Function used to parse a formatted string based on specified locale
-	function ϝ(date, format, locale) {
+	function formatted(date, format, locale) {
 		var d = date.getDate(),
 		    m = date.getMonth(),
 		    y = date.getFullYear(),
@@ -257,17 +242,22 @@
 		}, options);
 
 		// Public properties
-		this.format = options.format;
-		this.instances = [];
-		this.max = (isObj(options.max) ? options.max : {});
-		this.min = (isObj(options.min) ? options.min : {});
-		this.monthYearOnly = (options.monthYearOnly === true ? true : false);
+		this.format         = options.format;
+		this.instances      = [];
+		this.max            = ("object" == typeof options.max ? options.max : {});
+		this.min            = ("object" == typeof options.min ? options.min : {});
+		this.monthYearOnly  = (options.monthYearOnly === true);
 
 		// Private properties
 		this._i18n = _.i18n.en_GB;
 
 		var self = this, date = new Date();
-		(isObj(options.date) && (date = ((date = options.date) instanceof Date ? new Date(date) : new Date(date.year, date.month - 1, date.day))));
+
+		// Set initial date if specified in options
+		if(options.date && "object" == typeof (date = options.date)) {
+			date = (date instanceof Date ? new Date(date) :
+				new Date(date.year, date.month - 1, date.day));
+		}
 
 		// Parse minimum and maximum dates from options
 		(self.max instanceof Date && (self.max = { year: self.max.getFullYear(), month: self.max.getMonth() + 1, day: self.max.getDate() }));
@@ -277,8 +267,17 @@
 		function valid(year, month, day) {
 			var days, min = self.min, max = self.max, fixed;
 
-			while(day > (days = δ(new Date(year, month, day)).days)) { ++month; day -= day - days; }
-			while(month > 12) { ++year; month -= 12; }
+			// Fix day overflows
+			while(day > (days = δ(new Date(year, month, day)).days)) {
+				++month;
+				day -= day - days;
+			}
+
+			// Fix month overflows
+			while(month > 12) {
+				++year;
+				month -= 12;
+			}
 
 			if(!isNaN((fixed = new Date(year, month - 1, isNaN(day) ? 1 : day)))) {
 				year = fixed.getFullYear();
@@ -311,7 +310,7 @@
 		}
 
 		// Inject Chronpic in DOM Elements from constructor selector parameter
-		(isStr(selector) ? Array.prototype.slice.call(document.querySelectorAll(selector)) : [ selector ])
+		("string" == typeof selector ? [].slice.call(document.querySelectorAll(selector)) : [ selector ])
 		.forEach(function(element) {
 			if(element instanceof HTMLElement) {
 				_.instances.forEach(function(parent) {
@@ -328,21 +327,21 @@
 				((sibling.tagName == "DIV" && sibling.classList.contains(options.className)) || (sibling = null));
 
 				var className = options.className,
-				    container = ε("div." + className, { insertAfter: element, replace: sibling }),
+					container = new Element("div." + className, { insertAfter: element, replace: sibling }),
 				    instance,
 				    self = this,
 				    tables = {};
 
 				[ "day", "month" ].forEach(function(table) {
-					container.add((tables[table] = ε("table.hidden." + table)));
-					tables[table].head = ε("thead", { appendTo: tables[table] });
-					tables[table].body = ε("tbody", { appendTo: tables[table] });
+					container.add((tables[table] = new Element("table.hidden." + table)));
+					tables[table].head = new Element("thead", { appendTo: tables[table] });
+					tables[table].body = new Element("tbody", { appendTo: tables[table] });
 				});
 
 				self.instances.push((instance = {
 					date: new Date(date),
 					container: container,
-					element: ε(element),
+					element: new Element(element),
 					selected: {},
 					tables: tables,
 					value: "",
@@ -404,19 +403,19 @@
 
 						if(!table || table == "day") {
 							instance.tables.day.head.add([
-								ε("tr.title").add([
-									ε("th.prev[title=" + self.locale.prevMonth + "]", { html: "&lt;" })
+								new Element("tr.title").add([
+									new Element("th.prev[title=" + self.locale.prevMonth + "]", { html: "&lt;" })
 									.on("click", function(e) {
 										instance.date.setDate(1);
 										instance.month--;
 										instance.show("day");
 										e.stopPropagation();
 									}),
-									ε("th[colspan=6][title=" + self.locale.selectMonth + "]", { html: ϝ(instance.date, self.locale.titleMonth, self.locale) })
+									new Element("th[colspan=6][title=" + self.locale.selectMonth + "]", { html: formatted(instance.date, self.locale.titleMonth, self.locale) })
 									.on("click", function() {
 										instance.show("month");
 									}),
-									ε("th.next[title=" + self.locale.nextMonth + "]", { html: "&gt;" })
+									new Element("th.next[title=" + self.locale.nextMonth + "]", { html: "&gt;" })
 									.on("click", function(e) {
 										instance.date.setDate(1);
 										instance.month++;
@@ -424,23 +423,23 @@
 										e.stopPropagation();
 									})
 								]),
-								(lables = ε("tr.labels").add(ε("th.week", { html: self.locale.week })))
+								(lables = new Element("tr.labels").add(new Element("th.week", { html: self.locale.week })))
 							], true);
 
 							for(i = 0; i < 7; ++i) {
-								lables.add(ε("th.day[title=" + self.locale.dayOfWeek[dow % 7] + "]", { html: self.locale.dayOfWeekShort[dow++ % 7] }));
+								lables.add(new Element("th.day[title=" + self.locale.dayOfWeek[dow % 7] + "]", { html: self.locale.dayOfWeekShort[dow++ % 7] }));
 							}
 
 							instance.tables.day.body.clear();
 							dayTable(instance.year, instance.month).forEach(function(row) {
-								var tr = ε("tr", { appendTo: instance.tables.day.body });
-								tr.add(ε("td.week", { html: δ(row[0]).week }));
+								var tr = new Element("tr", { appendTo: instance.tables.day.body });
+								tr.add(new Element("td.week", { html: δ(row[0]).week }));
 
 								row.forEach(function(col) {
 									var classNames = ".day",
 										monthDiff = col.getMonth() - instance.month,
 										disabled = !valid(col.getFullYear(), col.getMonth() + 1, col.getDate()),
-										title = ϝ(col, self.locale.titleDay, self.locale),
+										title = formatted(col, self.locale.titleDay, self.locale),
 										elem;
 
 									((monthDiff == -1 || monthDiff == 11) && (classNames += ".prev"));
@@ -453,7 +452,7 @@
 										title += " (" + self.locale.disabled + ")";
 									}
 
-									tr.add((elem = ε("td[title=" + title + "]" + classNames, { html: col.getDate() })));
+									tr.add((elem = new Element("td[title=" + title + "]" + classNames, { html: col.getDate() })));
 									(!disabled && elem.on("click", function() {
 										instance.month = col.getMonth(),
 										instance.day = col.getDate();
@@ -465,15 +464,15 @@
 
 						if(!table || table == "month") {
 							instance.tables.month.head.add([
-								ε("tr.title").add([
-									ε("th.prev[title=" + self.locale.prevYear + "]", { html: "&lt;" })
+								new Element("tr.title").add([
+									new Element("th.prev[title=" + self.locale.prevYear + "]", { html: "&lt;" })
 									.on("click", function(e) {
 										instance.year--;
 										instance.show("month");
 										e.stopPropagation();
 									}),
-									ε("th.year[colspan=6][title=" + self.locale.year + "]").add(
-										ε("input[type=number][step=1][min=" + (self.min.year || 0) + "][max=" + (self.max.year || 9999) + "][value=" + instance.year + "]")
+									new Element("th.year[colspan=6][title=" + self.locale.year + "]").add(
+										new Element("input[type=number][step=1][min=" + (self.min.year || 0) + "][max=" + (self.max.year || 9999) + "][value=" + instance.year + "]")
 										.on("change", function(e, v) {
 											if(isNum((v = Number(e.target.value)))) {
 												instance.year = v;
@@ -482,7 +481,7 @@
 											}
 										})
 									),
-									ε("th.next[title=" + self.locale.nextYear + "]", { html: "&gt;" })
+									new Element("th.next[title=" + self.locale.nextYear + "]", { html: "&gt;" })
 									.on("click", function(e) {
 										instance.year++;
 										instance.show("month");
@@ -493,13 +492,13 @@
 
 							instance.tables.month.body.clear();
 							monthTable(instance.year).forEach(function(row) {
-								var tr = ε("tr", { appendTo: instance.tables.month.body });
+								var tr = new Element("tr", { appendTo: instance.tables.month.body });
 
 								row.forEach(function(col) {
 									var classNames = ".month",
 									    month = col.getMonth(),
 									    disabled = !valid(col.getFullYear(), month + 1),
-									    title = ϝ(col, self.locale.titleMonth, self.locale),
+									    title = formatted(col, self.locale.titleMonth, self.locale),
 									    elem;
 
 									(sel.month && δ(sel.month).compare(col) >= 2 && (classNames += ".selected"));
@@ -511,7 +510,7 @@
 										title += " (" + self.locale.disabled + ")";
 									}
 
-									tr.add((elem = ε("td[colspan=2][title=" + title + "]" + classNames, { html: self.locale.monthNameShort[month] })));
+									tr.add((elem = new Element("td[colspan=2][title=" + title + "]" + classNames, { html: self.locale.monthNameShort[month] })));
 									(!disabled && elem.on("click", function() {
 										instance.date.setDate(1);
 										instance.month = month;
@@ -548,7 +547,7 @@
 						}
 					},
 					update: function() {
-						this.value = element.value = ϝ(this.date, self.format, self._i18n);
+						this.value = element.value = formatted(this.date, self.format, self._i18n);
 						this.selected.day = new Date(this.date);
 
 						if(typeof options.onChange == 'function') {
@@ -565,7 +564,7 @@
 					}
 				}));
 
-				((isObj(options.date) && instance.update()) || (element.value = ""));
+				((options.date && instance.update()) || (element.value = ""));
 
 				// Handle DOM events
 				instance.element
@@ -588,7 +587,7 @@
 
 						self.format.match(/(\{[^}]*\}|[^{]+)/g).forEach(function(seg, idx, arr) {
 							// Translate formatted string if needed
-							fmt = /^\{(.*)\}$/.test(seg) ? ϝ(instance.date, seg, self._i18n) : seg;
+							fmt = /^\{(.*)\}$/.test(seg) ? formatted(instance.date, seg, self._i18n) : seg;
 
 							// Update end position of previous segment if present
 							((idx = segs.length) && (segs[idx - 1].end = pos));
@@ -776,19 +775,23 @@
 		_.instances.push(this);
 	}
 
-	_.VERSION = 0.31;
+	_.VERSION = 0.32;
 	_.instances = [];
 
 	_.prototype = {
 		get format() {
 			switch(this._fmt) {
-				case "{date}":     return this._i18n.formatDate;
-				case "{datetime}": return this._i18n.formatDateTime;
+			case "{date}":
+				return this._i18n.formatDate;
+
+			case "{datetime}":
+				return this._i18n.formatDateTime;
 			}
-			return (isStr(this._fmt) ? this._fmt : "");
+
+			return (this._fmt || "");
 		},
 		set format(value) {
-			this._fmt = (isStr(value) ? value : "");
+			this._fmt = ("string" == typeof value ? value : "");
 		},
 		get locale() {
 			return this._i18n;
@@ -834,8 +837,8 @@
 		}
 	};
 
-	// Enable dynamic resizing of Chronopic instances
 	if(typeof window != "undefined") {
+		// Enable dynamic resizing of Chronopic instances
 		window.addEventListener("resize", function(e) {
 			_.instances.forEach(function(instance) {
 				instance.instances.forEach(function(instance) {
