@@ -16,27 +16,35 @@
 		return (typeof value == "string" && value);
 	}
 
-	// Function used to parse a map of option variables and set default values
-	function parseOptions(options, defaults) {
-		(isObj(options) || (options = {}));
-
-		for(var d in defaults) {
-			(options.hasOwnProperty(d) || (options[d] = defaults[d]));
+	// Object.assign polyfill
+	("function" != typeof Object.assign && (Object.assign = function(target) {
+		if(undefined === target || null === target) {
+			throw new TypeError("Cannot convert undefined or null to object");
 		}
 
-		return options;
-	}
+		var output = Object(target), index, source, key;
+
+		for(index = 1; index < arguments.length; ++index) {
+			if(undefined !== (source = arguments[index]) && null !== source) {
+				for(key in source) {
+					(source.hasOwnProperty(key) && (output[key] = source[key]));
+				}
+			}
+		}
+
+		return output;
+	}));
 
 	// DOM Element helper class for easy DOM manipulation
 	function Element(selector, options) {
-		options = parseOptions(options, {
+		options = Object.assign({
 			appendTo:      null,
 			context:       document,
 			html:          "",
 			insertAfter:   null,
 			insertBefore:  null,
 			replace:       null
-		});
+		}, options);
 
 		var a, parsed, elem = (selector instanceof HTMLElement ? selector : null);
 
@@ -236,8 +244,8 @@
 
 	// Chronopic main class
 	function _(selector, options) {
-		// Constructor options and defaults
-		options = parseOptions(options, {
+		// Merge options with defaults
+		options = Object.assign({
 			className:      "chronopic",
 			date:           null,
 			format:         "{date}",
@@ -246,7 +254,7 @@
 			min:            { year: 1900 },
 			monthYearOnly:  false,
 			onChange:       null
-		});
+		}, options);
 
 		// Public properties
 		this.format = options.format;
@@ -768,7 +776,7 @@
 		_.instances.push(this);
 	}
 
-	_.VERSION = 0.30;
+	_.VERSION = 0.31;
 	_.instances = [];
 
 	_.prototype = {
