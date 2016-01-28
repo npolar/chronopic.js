@@ -78,6 +78,8 @@
 		} else if(options.insertBefore) {
 			options.insertBefore.parentNode.insertBefore(elem, options.insertBefore);
 		}
+
+		return this;
 	}
 
 	Element.prototype = {
@@ -232,6 +234,7 @@
 		// Merge options with defaults
 		options = Object.assign({
 			className:      "chronopic",
+			container:      null,
 			date:           null,
 			direction:      "down",
 			format:         "{date}",
@@ -243,6 +246,7 @@
 		}, options);
 
 		// Public properties
+		this.container      = options.container;
 		this.direction      = options.direction;
 		this.format         = options.format;
 		this.instances      = [];
@@ -536,31 +540,42 @@
 						this.rebuild(table);
 						this.visible = true;
 
-						var container = { elem: this.container.element, h: 0, w: 0 }, t,
-						    parent = { h: container.elem.parentNode.offsetHeight, w: container.elem.parentNode.offsetWidth },
-						    elem = { h: element.offsetHeight, w: element.offsetWidth, x: element.offsetLeft, y: element.offsetTop };
+						var widget = { elem: this.container.element },
+						    parent = { elem: (self.container instanceof HTMLElement ? self.container : widget.elem.parentNode) },
+						    target = { elem: element },
+						    dir = self.direction, t, upPos, downPos, centerPos, fitsDown, fitsUp;
 
+						// Calculate dimensions and positions
+						[ widget, parent, target ].forEach(function(item, idx) {
+							var rect = item.elem.getBoundingClientRect();
+
+							item.h = item.elem.offsetHeight;
+							item.w = item.elem.offsetWidth;
+							item.abs = { x: rect.left, y: rect.top };
+							item.rel = { x: item.elem.offsetLeft, y: item.elem.offsetTop };
+						});
+
+						// Show correct table and update widget dimensions
 						for(t in tables) {
 							(tables.hasOwnProperty(t) && tables[t].classes[(t == table ? "remove" : "add")]("hidden"));
-							container.h = Math.max(container.h, tables[t].element.offsetHeight);
-							container.w = Math.max(container.w, tables[t].element.offsetWidth);
+							widget.h = Math.max(widget.h, tables[t].element.offsetHeight);
+							widget.w = Math.max(widget.w, tables[t].element.offsetWidth);
 						}
 
-						var upPos = (elem.y - container.h) + "px",
-						    downPos = (elem.y + elem.h) + "px",
-						    centerPos = ((parent.h / 2) - (container.h / 2)) + "px",
-							fitsDown = ((elem.y + elem.h + container.h) < parent.h),
-						    fitsUp = (elem.y - container.h > 0),
-							dir = self.direction;
+						upPos = (target.rel.y - widget.h) + "px";
+						downPos = (target.rel.y + target.h) + "px";
+						centerPos = ((parent.h / 2) - (widget.h / 2)) + "px";
+						fitsDown = (target.abs.y + target.h + widget.h < parent.abs.y + parent.h);
+						fitsUp = (target.abs.y - widget.h > parent.abs.y);
 
-						container.elem.style.top =
+						widget.elem.style.top =
 							(dir == "down" ? downPos :
 								(dir == "up" ? upPos :
 									(fitsDown ? downPos :
 										(fitsUp ? upPos :
 											centerPos))));
 
-						(container.w == elem.w || (container.elem.style.width = elem.w + "px"));
+						(widget.w == target.w || (widget.elem.style.width = target.w + "px"));
 					},
 					update: function() {
 						this.value = element.value = formatted(this.date, self.format, self._i18n);
@@ -791,7 +806,7 @@
 		_.instances.push(this);
 	}
 
-	_.VERSION = 0.40;
+	_.VERSION = 0.41;
 	_.instances = [];
 
 	_.prototype = {

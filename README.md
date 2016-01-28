@@ -35,6 +35,7 @@ new Chronopic('input[type="datetime"]', {
 Key               | Value                                                               | Default
 ------------------|---------------------------------------------------------------------|--------------
 **className**     | Dot-separated CSS class names added to container                    | *.chronopic*
+**container**     | HTMLElement used as container when calculating auto popup direction | *null* (parent element)
 **date**          | Pre-selected date object (or *null*)                                | *null*
 **direction**     | Specify widget popup direction (**"down"**, **"up"** or **"auto"**) | *"down"*
 **format**        | Output format as a string (see format values below)                 | *{date}*
