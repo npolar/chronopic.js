@@ -173,6 +173,8 @@
 		return format
 		.replace(/{date}/gi, locale.formatDate)
 		.replace(/{datetime}/gi, locale.formatDateTime)
+		.replace(/{isodate}/gi, "{YYYY}-{MM}-{DD}")
+		.replace(/{yearmonth}/gi, locale.formatYearMonth)
 		.replace(/{ww}/gi, ("0" + w).slice(-2))
 		.replace(/{w}/gi, w)
 		.replace(/{DDDD}/g, locale.dayOfWeek[wd])
@@ -806,7 +808,7 @@
 		_.instances.push(this);
 	}
 
-	_.VERSION = 0.41;
+	_.VERSION = 0.42;
 	_.instances = [];
 
 	_.prototype = {
@@ -824,6 +826,9 @@
 
 			case "{datetime}":
 				return this._i18n.formatDateTime;
+
+			case "{yearmonth}":
+				return this._i18n.formatYearMonth;
 			}
 
 			return (this._fmt || "");
@@ -853,25 +858,26 @@
 	// Default locale settings
 	_.i18n = {
 		en_GB: {
-			anteMeridiem:   "㏂",
-			dayOfWeek:      [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
-			dayOfWeekShort: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
-			disabled:       "disabled",
-			formatDate:     "{D} {MMMM} {YYYY}",
-			formatDateTime: "{D} {MMMM} {YYYY}, {h}:{mm} {ap}",
-			month:          "Month",
-			monthName:      [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
-			monthNameShort: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
-			nextMonth:      "Next month",
-			nextYear:       "Next year",
-			postMeridiem:   "㏘",
-			prevMonth:      "Previous month",
-			prevYear:       "Previous year",
-			selectMonth:    "Select month",
-			titleDay:       "{DDDD} {D} {MMMM} {YYYY}",
-			titleMonth:     "{MMMM} {YYYY}",
-			week:           "Week",
-			year:           "Year"
+			anteMeridiem:       "㏂",
+			dayOfWeek:          [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
+			dayOfWeekShort:     [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
+			disabled:           "disabled",
+			formatDate:         "{D} {MMMM} {YYYY}",
+			formatDateTime:     "{D} {MMMM} {YYYY}, {h}:{mm} {ap}",
+			formatYearMonth:    "{MMMM} {YYYY}",
+			month:              "Month",
+			monthName:          [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ],
+			monthNameShort:     [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ],
+			nextMonth:          "Next month",
+			nextYear:           "Next year",
+			postMeridiem:       "㏘",
+			prevMonth:          "Previous month",
+			prevYear:           "Previous year",
+			selectMonth:        "Select month",
+			titleDay:           "{DDDD} {D} {MMMM} {YYYY}",
+			titleMonth:         "{MMMM} {YYYY}",
+			week:               "Week",
+			year:               "Year"
 		}
 	};
 

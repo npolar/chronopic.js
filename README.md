@@ -50,6 +50,8 @@ Code            | Replaced with
 ----------------|--------------
 **{date}**      | Locale specific date format (date, month, year)
 **{datetime}**  | Locale specific date/time format (date, month, year, time)
+**{isodate}**   | ISO 8601 date format (yyyy-mm-dd)
+**{yearmonth}** | Locale specific year/month format (month, year)
 **{YYYY}**      | Year (four digits)
 **{YY}**        | Year (two digits)
 **{MMMM}**      | Month (full name)
