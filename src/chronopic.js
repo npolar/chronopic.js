@@ -609,6 +609,12 @@
 					    beg = e.target.selectionStart, end,
 					    inc, tmp, leftmost, rightmost, genSegs;
 
+					// 27:escape
+					if(key == 27) {
+						instance.hide();
+						return;
+					}
+
 					// 37:left, 38:up, 39:right, 40:down
 					if(key < 37 || key > 40) {
 						return;
@@ -808,7 +814,7 @@
 		_.instances.push(this);
 	}
 
-	_.VERSION = 0.43;
+	_.VERSION = 0.44;
 	_.instances = [];
 
 	_.prototype = {
